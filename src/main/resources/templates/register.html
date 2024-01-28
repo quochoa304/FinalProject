@@ -1,21 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title><!DOCTYPE html>
-        <html lang="en" xmlns:th="http://www.thymeleaf.org">
-        <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Registration</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
 </head>
 <body>
 <h2>Registration</h2>
 
 <form action="/register" method="post">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required>
+    <label for="name">Username:</label>
+    <input type="text" id="name" name="name" required>
     <br>
 
     <label for="password">Password:</label>
@@ -24,11 +20,5 @@
 
     <button type="submit">Register</button>
 </form>
-</body>
-</html>
-</title>
-</head>
-<body>
-
 </body>
 </html>
