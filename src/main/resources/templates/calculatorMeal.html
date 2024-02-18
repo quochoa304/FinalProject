@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Meal Calorie Calculator</title>
+</head>
+<body>
+
+<h2>Meal Calorie Calculator</h2>
+
+<form action="/calculate-meal-calories" method="post">
+    <label for="weight">Weight (kg):</label>
+    <input type="text" id="weight" name="weight" required><br>
+
+    <label for="height">Height (cm):</label>
+    <input type="text" id="height" name="height" required><br>
+
+    <label for="age">Age:</label>
+    <input type="text" id="age" name="age" required><br>
+
+    <label for="sex">Sex:</label>
+    <select id="sex" name="sex" required>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+    </select><br>
+
+    <label for="activity">Activity Level:</label>
+    <input type="text" id="activity" name="activity" required><br>
+
+    <button type="submit">Calculate</button>
+</form>
+
+<!-- Display calculated calories and recommended meals -->
+<h3>Calories: <span th:text="${calorie}"></span></h3>
+
+<h3>Recommended Meals:</h3>
+<ul>
+    <li th:each="meal : ${recommendedMeals}">
+        <span th:text="${meal.key}"></span> - <span th:text="${meal.value}"></span> servings
+    </li>
+</ul>
+
+</body>
+</html>
