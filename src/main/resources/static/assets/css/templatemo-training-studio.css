@@ -611,9 +611,6 @@ banner
     z-index: -1;
 }
 
-#bg-video::-webkit-media-controls {
-    display: none !important;
-}
 
 .video-overlay {
     position: absolute;

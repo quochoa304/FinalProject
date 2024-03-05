@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap" rel="stylesheet">
+
+    <title>GW Fitness Studio</title>
+
+    <!-- Additional CSS Files -->
+    <link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/css/font-awesome.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/css/templatemo-training-studio.css}" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+<!-- ***** Preloader Start ***** -->
+<div id="js-preloader" class="js-preloader">
+    <div class="preloader-inner">
+        <span class="dot"></span>
+        <div class="dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</div>
+<!-- ***** Preloader End ***** -->
+
+<!-- ***** Header Area Start ***** -->
+<header class="header-area header-sticky">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav class="main-nav">
+                    <!-- ***** Logo Start ***** -->
+                    <a th:href="@{/}" class="logo">GW <em> Fitness</em></a>
+                    <!-- ***** Logo End ***** -->
+                    <!-- ***** Menu Start ***** -->
+                    <ul class="nav">
+                        <li class="scroll-to-section"><a th:href="@{${'/#top'}}" class="active">Home</a></li>
+                        <li class="scroll-to-section"><a th:href="@{${'/#features'}}">About</a></li>
+                        <li class="scroll-to-section"><a th:href="@{${'/#our-classes'}}">Classes</a></li>
+                        <li class="scroll-to-section"><a th:href="@{${'/#schedule'}}">Schedules</a></li>
+                        <li class="scroll-to-section"><a th:href="@{${'/#contact-us'}}">Contact</a></li>
+
+                        <li class="main-button"><a href="/registration">Sign Up</a></li>
+                    </ul>
+                    <a class='menu-trigger'>
+                        <span>Menu</span>
+                    </a>
+                    <!-- ***** Menu End ***** -->
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- ***** Header Area End ***** -->
+
+<!-- ***** Main Banner Area Start ***** -->
+<div class="main-banner" id="top">
+    <video autoplay muted loop id="bg-video">
+        <source th:src="@{/assets/images/gym-video.mp4}" type="video/mp4" />
+    </video>
+
+    <div class="video-overlay header-text">
+        <div class="caption">
+            <h6 id="slogan">work harder, get stronger</h6>
+            <h2>Calo <em>calculator</em></h2>
+            <h6>
+                <style>
+
+                    .form-control {
+                        display: flex;
+                        align-items: center;
+                        margin-bottom: 10px;
+                        background-color: transparent;
+                        width: 60%;
+                        margin-left: auto;
+                        margin-right: auto;
+                    }
+
+                    label {
+                        width: 150px; /* Adjust based on your needs */
+                        text-align: left;
+                        margin-right: 10px;
+                        color: #ed563b;
+                    }
+
+                    input, select {
+                        flex: 1;
+                    }
+
+                    button {
+                        text-align: center;
+                    }
+
+                </style>
+                <form action="#" th:action="@{/caloCalculator}" th:object="${caloCalcRequest}" method="post">
+                    <div class="form-control">
+                        <label for="height">Height (cm):</label>
+                        <input type="number" id="height" name="height" required />
+                    </div>
+                    <div class="form-control">
+                        <label for="weight">Weight (kg):</label>
+                        <input type="number" id="weight" name="weight" required />
+                    </div>
+                    <div class="form-control">
+                        <label for="age">Age:</label>
+                        <input type="number" id="age" name="age" required />
+                    </div>
+                    <div class="form-control">
+                        <label for="gender">Gender:</label>
+                        <select id="gender" name="gender" required>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+                    <div class="form-control">
+                        <label for="activityLevel">Activity Level:</label>
+                        <select id="activityLevel" name="activityLevel" required>
+                            <option value="sedentary">Sedentary</option>
+                            <option value="light">Light Activity</option>
+                            <option value="moderate">Moderate Activity</option>
+                            <option value="active">Active</option>
+                        </select>
+                    </div>
+                    <br>
+                    <div>
+                        <button type="submit">Calculate</button>
+                    </div>
+                </form>
+
+            </h6>
+            <br><br>
+            <div  id = "qwe" class="main-button scroll-to-section">
+                <a>The calculated caloric needs are: <span id="calo" th:text="${baseCalo}"></span> calories.<br>
+                    Nutrition: <br>
+                    Fat:<span th:text="${fat}"></span><br>
+                    Protein:<span th:text="${protein}"></span><br>
+                    Carb:<span th:text="${carb}"></span>
+                </a>
+            </div>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    // Lấy giá trị bên trong của span có id là calo
+                    var baseCalo = document.getElementById('calo').innerText;
+
+                    // Chuyển đổi giá trị baseCalo từ chuỗi sang số để có thể so sánh
+                    baseCalo = parseInt(baseCalo, 10);
+
+                    // Kiểm tra nếu baseCalo khác 0
+                    if (baseCalo !== 0) {
+                        // Hiển thị thẻ div có id là qwe
+                        document.getElementById('qwe').style.display = 'block';
+                        document.getElementById('slogan').style.display = 'none';
+                    } else {
+                        // Ẩn thẻ div nếu baseCalo bằng 0
+                        document.getElementById('qwe').style.display = 'none';
+                    }
+
+                });
+            </script>
+        </div>
+    </div>
+</div>
+<!-- ***** Main Banner Area End ***** -->
+<section class="section" id="features">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 offset-lg-3">
+                <div class="section-heading">
+                    <h2>Choose <em>Diet</em></h2>
+                    <img src="../assets/images/line-dec.png" alt="waves">
+                    <p>Training Studio is free CSS template for gyms and fitness centers. You are allowed to use this layout for your business website.</p>
+                </div>
+                <div>
+                <label for="qhoa3042001">Favorite Food:</label>
+                    <input list="qhoa3042001" id="foodInput" name="browser">
+                    <datalist id="qhoa3042001">
+                        <option value="Salad">
+                        <option value="Chicken">
+                        <option value="Fish">
+                        <option value="Beef">
+                        <option value="Tomato">
+                        <option value="Pork">
+                        <option value="Lamb">
+                        <option value="Turkey">
+                        <option value="Duck">
+                        <option value="Venison">
+                        <option value="Tofu">
+                        <option value="Seitan">
+                        <option value="Tempeh">
+                        <option value="Eggplant">
+                        <option value="Lentils">
+                        <option value="Chickpeas">
+                        <option value="Mushrooms">
+                        <option value="Quinoa">
+                        <option value="Rice">
+                        <option value="Pasta">
+                        <option value="Spinach">Spinach</option>
+                        <option value="Kale">Kale</option>
+                        <option value="Broccoli">Broccoli</option>
+                        <option value="Cauliflower">Cauliflower</option>
+                        <option value="Sweet Potato">Sweet Potato</option>
+                        <option value="Peppers">Peppers</option>
+                        <option value="Zucchini">Zucchini</option>
+                        <option value="Asparagus">Asparagus</option>
+                        <option value="Brussels Sprouts">Brussels Sprouts</option>
+                        <option value="Onions">Onions</option>
+                        <option value="Garlic">Garlic</option>
+                        <option value="Leeks">Leeks</option>
+                        <option value="Cabbage">Cabbage</option>
+                        <option value="Cucumber">Cucumber</option>
+                        <option value="Celery">Celery</option>
+                        <option value="Carrots">Carrots</option>
+                        <option value="Beans">Beans</option>
+                        <option value="Peas">Peas</option>
+                        <option value="Corn">Corn</option>
+                        <option value="Potatoes">Potatoes</option>
+                        <option value="Avocado">Avocado</option>
+                        <option value="Apples">Apples</option>
+                        <option value="Bananas">Bananas</option>
+                        <option value="Oranges">Oranges</option>
+                        <option value="Peaches">Peaches</option>
+                        <option value="Grapes">Grapes</option>
+                        <option value="Cherries">Cherries</option>
+                        <option value="Strawberries">Strawberries</option>
+                        <option value="Blueberries">Blueberries</option>
+                        <option value="Watermelon">Watermelon</option>
+                    </datalist><br>
+                    <label for="mealType">Meal Type:</label>
+                    <select id="mealType">
+                        <!-- Add your favorite foods here as options -->
+                        <option value="Breakfast">Breakfast</option>
+                        <option value="Dinner">Dinner</option>
+                        <option value="Lunch">Lunch</option>
+                        <option value="Snack">Snack</option>
+                        <option value="Teatime">Teatime</option>
+                        <!-- Add more options as needed -->
+                    </select><br>
+                    <label for="calories">Calories</label>
+                    <input type="text" id="calories" th:value="${baseCalo}"><br>
+                    <label style="display: flex; width: 130%">
+                    <label >Diet type:</label>&emsp;
+                    <input type="radio" id="balance" name="fav_language" value="balance">&nbsp;
+                    <label style="color: #000000;" for="balance">Balance</label>
+                    <input type="radio" id="low-calo" name="fav_language" value="low-calo">&nbsp;
+                    <label style="color: #000000;" for="low-calo">Low-calo</label>
+                    <input type="radio" id="high-protein" name="fav_language" value="high-protein">&nbsp;
+                    <label style="color: #000000;" for="high-protein">High-protein</label>
+                    </label>
+                    <br>
+                    <button style="display: block;text-align: center" onclick="suggestMeals()">Plan your meal</button>
+                    <br><br>
+                    <h5 style="display: block; text-align: center">Meal Suggestions:</h5>
+
+                    <script>
+                     async function suggestMeals() {
+                         const selectedFood = document.getElementById("foodInput").value;
+
+                         const mealTypeElement = document.getElementById("mealType");
+                         const mealType = encodeURIComponent(mealTypeElement.value);
+
+                         const dietTypes = document.getElementsByName("fav_language");
+
+                         const calo = encodeURIComponent(document.getElementById("calories").value);
+
+                         const mealSuggestions = document.getElementById("mealSuggestions");
+                         mealSuggestions.innerHTML = ""; // Clear previous suggestions
+
+                         // Cập nhật API URL bằng cách sử dụng giá trị selectedFood
+                         const appId = '799b7e0a';
+                         const appKey = '2a7cbd461d76b465dacad645ba80f3b7';
+                         let queryParams = [];
+                         if (selectedFood) queryParams.push(`q=${selectedFood}`);
+                         if (mealType) queryParams.push(`mealType=${mealType}`);
+                         if (calo) queryParams.push(`calories=${calo}`);
+
+                         const apiUrl = `https://api.edamam.com/search?${queryParams.join('&')}&app_id=${appId}&app_key=${appKey}`;
+                         try {
+                             const response = await fetch(apiUrl);
+                             const data = await response.json();
+
+                             // Extract meals from the API response
+                             const meals = data.hits.map(hit => ({
+                                 name: hit.recipe.label,
+                                 fat: hit.recipe.totalNutrients.FAT.quantity,
+                                 protein: hit.recipe.totalNutrients.PROCNT.quantity,
+                                 carb: hit.recipe.totalNutrients.CHOCDF.quantity,
+                                 totalCalories: hit.recipe.calories,
+                                 serving: hit.recipe.yield,
+
+                                 image: hit.recipe.image
+                             }));
+
+                             meals.slice(0, 9).forEach(meal => {
+                                 const mealDiv = document.createElement("div");
+                                 mealDiv.classList.add("meal-item");
+
+                                 // Create an image element
+                                 const image = document.createElement("img");
+                                 image.src = meal.image;
+                                 image.alt = meal.name + " Image";
+                                 image.classList.add("mealImage");
+                                 mealDiv.appendChild(image);
+
+                                 // Add meal details
+                                 mealDiv.innerHTML += `<br>${meal.serving} servings of ${meal.name}: ${meal.totalCalories.toFixed(2) / 4 /*1 of 4 servings*/} kcal, ${meal.fat.toFixed(2)}g fat, ${meal.protein.toFixed(2)}g protein, ${meal.carb.toFixed(2)}g carbohydrate`;
+
+                                 mealSuggestions.appendChild(mealDiv);
+                             });
+                         } catch (error) {
+                             console.error('Error fetching meal suggestions:', error);
+                         }
+                     }
+                </script>
+
+                </div>
+            </div>
+            <table id="mealSuggestions"></table>
+            <style>
+                #mealSuggestions {
+                    width: 90%; /* 2/3 của màn hình */
+                    margin: 0 auto; /* Căn giữa */
+                    display: flex; /* Sử dụng Flexbox */
+                    flex-wrap: wrap; /* Cho phép các mục chuyển sang hàng mới */
+                    justify-content: center; /* Căn giữa các mục theo chiều ngang */
+                }
+                .meal-item:hover {
+                    background-color: #ed563b; /* Màu nền mới khi hover */
+                    cursor: pointer; /* Thay đổi con trỏ chuột để báo hiệu có thể tương tác */
+                }
+
+                .meal-item {
+                    flex: 1 1 30%; /* Mỗi mục sẽ cố gắng chiếm 30% chiều rộng của container */
+                    margin: 10px; /* Thêm một chút không gian giữa các mục */
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Tùy chọn: Thêm bóng đổ cho mỗi mục */
+                    text-align: center; /* Căn giữa nội dung văn bản trong mỗi mục */
+                }
+                .meal-item img {
+                    max-width: 100%; /* Đảm bảo ảnh không vượt quá kích thước của mục */
+                    height: auto; /* Giữ tỷ lệ ảnh */
+                }
+            </style>
+        </div>
+    </div>
+</section>
+
+<script src="/assets/js/jquery-2.1.0.min.js"></script>
+<script th:src="@{/assets/js/jquery-2.1.0.min.js}"></script>
+
+<!-- Bootstrap -->
+<script src="/assets/js/popper.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+
+<!-- Plugins -->
+<script src="/assets/js/scrollreveal.min.js"></script>
+<script src="/assets/js/waypoints.min.js"></script>
+<script src="/assets/js/jquery.counterup.min.js"></script>
+<script src="/assets/js/imgfix.min.js"></script>
+<script src="/assets/js/mixitup.js"></script>
+<script src="/assets/js/accordions.js"></script>
+
+<!-- Global Init -->
+<script src="/assets/js/custom.js"></script>
+</body>
+
+</html>

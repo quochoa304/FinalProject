@@ -2,6 +2,7 @@ package edu.poly.finalproject.model;
 
 import jakarta.persistence.*;
 
+
 import java.util.Collection;
 
 @Entity

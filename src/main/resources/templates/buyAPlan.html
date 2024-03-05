@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap" rel="stylesheet">
+
+    <title>GW Fitness Studio</title>
+
+    <!-- Additional CSS Files -->
+    <link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/css/font-awesome.css}" rel="stylesheet" type="text/css" />
+    <link th:href="@{/assets/css/templatemo-training-studio.css}" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+<!-- ***** Preloader Start ***** -->
+<div id="js-preloader" class="js-preloader">
+    <div class="preloader-inner">
+        <span class="dot"></span>
+        <div class="dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</div>
+<!-- ***** Preloader End ***** -->
+
+<!-- ***** Header Area Start ***** -->
+<header class="header-area header-sticky">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav class="main-nav">
+                    <!-- ***** Logo Start ***** -->
+                    <a th:href="@{/}" class="logo">GW <em> Fitness</em></a>
+                    <!-- ***** Logo End ***** -->
+                    <!-- ***** Menu Start ***** -->
+                    <ul class="nav">
+                        <li class="scroll-to-section"><a th:href="@{${'/#top'}}" class="active">Home</a></li>
+                        <li class="scroll-to-section"><a th:href="@{${'/#features'}}">About</a></li>
+                        <li class="scroll-to-section"><a th:href="@{${'/#our-classes'}}">Classes</a></li>
+                        <li class="scroll-to-section"><a th:href="@{${'/#schedule'}}">Schedules</a></li>
+                        <li class="scroll-to-section"><a th:href="@{${'/#contact-us'}}">Contact</a></li>
+
+                        <li class="scroll-to-section"><a th:href="@{${'/logout'}}">Log Out</a></li>
+                    </ul>
+                    <a class='menu-trigger'>
+                        <span>Menu</span>
+                    </a>
+                    <!-- ***** Menu End ***** -->
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>
+<!-- ***** Header Area End ***** -->
+
+<!-- ***** Footer Area Start ***** -->
+<footer class="footer-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="footer-widget">
+                            <h5 class="widget-title">Contact Us</h5>
+                            <p><i class="fa fa-envelope"></i> contact@example.com</p>
+                            <p><i class="fa fa-phone"></i> +1234567890</p>
+                            <p><i class="fa fa-map-marker"></i> 123 Street, City, Country</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="footer-widget">
+                            <h5 class="widget-title">Follow Us</h5>
+                            <ul class="social">
+                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+                                <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
+                                <li><a href="#"><i class="fa fa-instagram"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- ***** Footer Area End ***** -->
+
+<!-- jQuery -->
+<script src="/assets/js/jquery-2.1.0.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="/assets/js/popper.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+
+<!-- Plugins -->
+<script src="/assets/js/scrollreveal.min.js"></script>
+<script src="/assets/js/waypoints.min.js"></script>
+<script src="/assets/js/jquery.counterup.min.js"></script>
+<script src="/assets/js/imgfix.min.js"></script>
+<script src="/assets/js/mixitup.js"></script>
+<script src="/assets/js/accordions.js"></script>
+
+<!-- Global Init -->
+<script src="/assets/js/custom.js"></script>
+</body>
+
+</html>

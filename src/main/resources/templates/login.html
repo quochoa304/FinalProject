@@ -10,7 +10,7 @@
           crossorigin="anonymous">
 
 </head>
-<body>
+<body class="img js-fullheight" style="background-image: url(/assets/images/slide-01.jpg);">
 
 <!-- create navigation bar ( header) -->
 <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -35,7 +35,7 @@
     <div class = "row">
         <div class = "col-md-6 col-md-offset-3">
 
-            <h1> User Login Page </h1>
+            <h1 style="color: chocolate"> User Login Page </h1>
             <form th:action="@{/login}" method="post">
 
                 <!-- error message -->
@@ -49,14 +49,14 @@
                     <div class="alert alert-info">You have been logged out.</div>
                 </div>
 
-                <div class = "form-group">
+                <div style="color: #95999c" class = "form-group">
                     <label for ="username"> Username </label> :
                     <input type="text" class = "form-control" id ="username" name = "username"
                            placeholder="Enter Email ID" autofocus="autofocus">
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>: <input type="password"
+                    <label style="color: #95999c" for="password">Password</label>: <input type="password"
                                                                    id="password" name="password" class="form-control"
                                                                    placeholder="Enter Password" />
                 </div>

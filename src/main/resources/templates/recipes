@@ -1,0 +1,29 @@
+package edu.poly.finalproject.Controller;
+
+import edu.poly.finalproject.model.CaloCalculatorRequest;
+import edu.poly.finalproject.service.RecipeService;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class RecipeController {
+
+    private final RecipeService recipeService;
+
+    public RecipeController(RecipeService recipeService) {
+        this.recipeService = recipeService;
+    }
+
+    @GetMapping("/recipes")
+    public String searchRecipes(@RequestParam String query,
+                                @RequestParam(required = false) String diet,
+                                @RequestParam(required = false) String health,
+                                @RequestParam(required = false) String cuisineType,
+                                @RequestParam(required = false) String mealType,
+                                @RequestParam(required = false) String dishType) {
+        return recipeService.searchRecipes(query, diet, health, cuisineType, mealType, dishType);
+    }
+
+}

@@ -20,4 +20,8 @@ public class MainController {
     public String member() {
         return "member";
     }
+    @GetMapping("/classes")
+    public String classes() {
+        return "classes";
+    }
 }

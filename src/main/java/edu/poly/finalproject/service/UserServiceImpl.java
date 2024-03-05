@@ -1,5 +1,9 @@
 package edu.poly.finalproject.service;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 import edu.poly.finalproject.Controller.UserRegistrationDto;
 import edu.poly.finalproject.model.Role;
 import edu.poly.finalproject.model.User;
@@ -10,10 +14,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 
 
