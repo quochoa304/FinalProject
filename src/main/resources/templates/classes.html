@@ -51,7 +51,7 @@
     }
     .fit-form input[type="radio"] {
         width: auto; /* Giữ nguyên chiều rộng tự động */
-        margin-left: 40%; /* Loại bỏ khoảng cách lề trái để căn chính xác với các input khác */
+        margin-left: 10%; /* Loại bỏ khoảng cách lề trái để căn chính xác với các input khác */
         margin-right: 10px;
     }
     .form-group.gender input[type="radio"] + label + input[type="radio"] {
@@ -163,11 +163,13 @@
                         </select>
                     </div>
                     <div class="form-group gender">
+                        <label>Gender</label>
                         <input id="maleGender" name="gender" type="radio" value="Male">
                         <label for="maleGender">Male</label>
                         <input id="femaleGender" name="gender" type="radio" value="Female">
                         <label for="femaleGender">Female</label>
                     </div>
+
                 </div>
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {

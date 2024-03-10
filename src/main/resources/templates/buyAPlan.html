@@ -1,115 +1,78 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
-
+<html xmlns:th="http://www.thymeleaf.org" lang=en>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link href="https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i&display=swap" rel="stylesheet">
-
-    <title>GW Fitness Studio</title>
-
-    <!-- Additional CSS Files -->
-    <link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet" type="text/css" />
-    <link th:href="@{/assets/css/font-awesome.css}" rel="stylesheet" type="text/css" />
-    <link th:href="@{/assets/css/templatemo-training-studio.css}" rel="stylesheet" type="text/css" />
+    <meta charset="UTF-8">
+    <title>Buy a Gym Plan</title>
+    <!-- Thêm CSS và JavaScript nếu cần -->
 </head>
-
 <body>
+<h1>Choose Your Gym Plan</h1>
 
-<!-- ***** Preloader Start ***** -->
-<div id="js-preloader" class="js-preloader">
-    <div class="preloader-inner">
-        <span class="dot"></span>
-        <div class="dots">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
+<!-- Hiển thị danh sách các gói tập -->
+<form th:action="@{/buy-a-plan}" method="post">
+    <div th:if="${membership != null}">
+        <h2>Membership Details</h2>
+        <p>Membership Type: <span th:text="${membership.name}"></span></p>
+        <p>Expiry Date: <span th:text="${#temporals.format(expiryDate, 'dd/MM/yyyy')}"></span></p>
+        <p>Purchase Date: <span th:text="${#temporals.format(purchaseDate, 'dd/MM/yyyy')}"></span></p>
     </div>
-</div>
-<!-- ***** Preloader End ***** -->
-
-<!-- ***** Header Area Start ***** -->
-<header class="header-area header-sticky">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <nav class="main-nav">
-                    <!-- ***** Logo Start ***** -->
-                    <a th:href="@{/}" class="logo">GW <em> Fitness</em></a>
-                    <!-- ***** Logo End ***** -->
-                    <!-- ***** Menu Start ***** -->
-                    <ul class="nav">
-                        <li class="scroll-to-section"><a th:href="@{${'/#top'}}" class="active">Home</a></li>
-                        <li class="scroll-to-section"><a th:href="@{${'/#features'}}">About</a></li>
-                        <li class="scroll-to-section"><a th:href="@{${'/#our-classes'}}">Classes</a></li>
-                        <li class="scroll-to-section"><a th:href="@{${'/#schedule'}}">Schedules</a></li>
-                        <li class="scroll-to-section"><a th:href="@{${'/#contact-us'}}">Contact</a></li>
-
-                        <li class="scroll-to-section"><a th:href="@{${'/logout'}}">Log Out</a></li>
-                    </ul>
-                    <a class='menu-trigger'>
-                        <span>Menu</span>
-                    </a>
-                    <!-- ***** Menu End ***** -->
-                </nav>
-            </div>
-        </div>
+    <div th:if="${message != null}">
+        <p th:text="${message}"></p>
     </div>
-</header>
-<!-- ***** Header Area End ***** -->
-
-<!-- ***** Footer Area Start ***** -->
-<footer class="footer-area">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="row">
-                    <div class="col-lg-6 col-md-6 col-sm-6">
-                        <div class="footer-widget">
-                            <h5 class="widget-title">Contact Us</h5>
-                            <p><i class="fa fa-envelope"></i> contact@example.com</p>
-                            <p><i class="fa fa-phone"></i> +1234567890</p>
-                            <p><i class="fa fa-map-marker"></i> 123 Street, City, Country</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-6 col-sm-6">
-                        <div class="footer-widget">
-                            <h5 class="widget-title">Follow Us</h5>
-                            <ul class="social">
-                                <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                                <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-                                <li><a href="#"><i class="fa fa-instagram"></i></a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div th:if="${param.success}">
+        <script th:inline="javascript">
+            window.onload = function() {
+                alert("Successfully purchase.");
+            };
+        </script>
+        <a href="/member"> Back to home page</a>
     </div>
-</footer>
-<!-- ***** Footer Area End ***** -->
 
-<!-- jQuery -->
-<script src="/assets/js/jquery-2.1.0.min.js"></script>
+    <div th:if="${param.duplicate}">
+        <script th:inline="javascript">
+            window.onload = function() {
+                alert("Bạn đã mua rồi.");
+            };
+        </script>
+        <a href="/member"> Back to home page</a>
+    </div>
+    <div>
+        <label for="membership_Id">Select Gym Plan:</label>
+        <select id="membership_Id" name="membership_Id">
+            <!-- Lặp qua mỗi gymMembership và tạo một option cho mỗi gói -->
+            <option th:each="membership : ${gymMemberships}"
+                    th:value="${membership.id}"
+                    th:text="${membership.name}">Gym Plan Name</option>
+        </select>
+        <input type="hidden" id="durationMonthsInput" name="durationMonths" value="1" />
+        <script>
+            // JavaScript to update durationMonths when a plan is selected
+            document.addEventListener("DOMContentLoaded", function() {
+                // Get the select element
+                const selectElement = document.getElementById('membership_Id');
+                // Get the hidden input element
+                const durationMonthsInput = document.getElementById('durationMonthsInput');
 
-<!-- Bootstrap -->
-<script src="/assets/js/popper.js"></script>
-<script src="/assets/js/bootstrap.min.js"></script>
+                // Add event listener for change event on select element
+                selectElement.addEventListener('change', function() {
+                    // Get the selected option
+                    const selectedOption = selectElement.options[selectElement.selectedIndex];
+                    // Get the duration months from the selected option
+                    const durationMonths = selectedOption.getAttribute('data-duration-months');
+                    // Update the value of durationMonthsInput if durationMonths is not empty
+                    if (durationMonths !== null && durationMonths !== "") {
+                        durationMonthsInput.value = parseInt(durationMonths);
+                    } else {
+                        // If durationMonths is empty or not available, set the value to 0 or any default value
+                        durationMonthsInput.value = 1; // You can adjust this default value as needed
+                    }
+                });
+            });
 
-<!-- Plugins -->
-<script src="/assets/js/scrollreveal.min.js"></script>
-<script src="/assets/js/waypoints.min.js"></script>
-<script src="/assets/js/jquery.counterup.min.js"></script>
-<script src="/assets/js/imgfix.min.js"></script>
-<script src="/assets/js/mixitup.js"></script>
-<script src="/assets/js/accordions.js"></script>
+        </script>
+    </div>
 
-<!-- Global Init -->
-<script src="/assets/js/custom.js"></script>
+    <button type="submit">Buy Plan</button>
+</form>
 </body>
-
 </html>

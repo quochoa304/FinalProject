@@ -24,4 +24,8 @@ public class MainController {
     public String classes() {
         return "classes";
     }
+    @GetMapping("/admin")
+    public String admin() {
+        return "adminPage";
+    }
 }
