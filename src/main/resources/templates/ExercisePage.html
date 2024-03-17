@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Exercises</title>
+    <!-- Liên kết CSS tại đây -->
+</head>
+<body>
+<h1>Quản lý Exercises</h1>
+
+<!-- Form thêm mới hoặc chỉnh sửa Exercise -->
+<div>
+    <h2>Form Exercise</h2>
+    <form th:action="@{/admin/exercises/save}" th:object="${exercise}" method="post">
+        <input type="hidden" th:field="*{id}" />
+        <div>
+            <label for="name">Tên:</label>
+            <input type="text" id="name" th:field="*{name}" required />
+        </div>
+        <div>
+            <label for="description">Mô tả:</label>
+            <input type="text" id="description" th:field="*{description}" />
+        </div>
+        <div>
+            <label for="muscle">Cơ bắp chính:</label>
+            <input type="text" id="muscle" th:field="*{type}" />
+        </div>
+        <button type="submit">Lưu</button>
+    </form>
+</div>
+
+<!-- Hiển thị danh sách Exercises -->
+<div>
+    <h2>Danh sách Exercises</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Tên</th>
+            <th>Mô tả</th>
+            <th>Cơ bắp chính</th>
+            <th>Thao tác</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="exercise : ${exercisesList}"> <!-- Sửa ở đây -->
+            <td th:text="${exercise.name}"></td>
+            <td th:text="${exercise.description}"></td>
+            <td th:text="${exercise.type}"></td>
+            <td>
+                <a th:href="@{/admin/exercises/edit/{id}(id=${exercise.id})}">Sửa</a>
+                <a th:href="@{/admin/exercises/delete/{id}(id=${exercise.id})}" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">Xóa</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
