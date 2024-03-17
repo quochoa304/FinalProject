@@ -13,6 +13,8 @@ public class GymMembershipService {
 
     @Autowired
     private GymMembershipRepository gymMembershipRepository;
+    @Autowired
+    private ExerciseService exerciseService;
 
     public List<GymMembership> listAll() {
         return gymMembershipRepository.findAll();
@@ -35,10 +37,16 @@ public class GymMembershipService {
     }
 
     public void addExerciseToMembership(Long membershipId, Exercise exercise) {
+        if (exercise.getId() == null) {
+            // Lưu Exercise vào cơ sở dữ liệu trước khi thêm vào GymMembership
+            // Giả sử bạn có một ExerciseService hoặc tương tự để làm việc này
+            exerciseService.saveExercise(exercise);
+        }
         GymMembership gymMembership = gymMembershipRepository.findById(membershipId).orElse(null);
         if (gymMembership != null) {
             gymMembership.getExercises().add(exercise);
             gymMembershipRepository.save(gymMembership);
         }
     }
+
 }

@@ -47,6 +47,8 @@
         <td>
             <a th:href="@{/admin/gym-memberships/edit/{id}(id=${membership.id})}">Edit</a>
             |
+            <a th:href="@{/admin/gym-memberships/{id}/add-exercises(id=${membership.id})}">Add Exercises</a>
+            |
             <a th:href="@{/admin/gym-memberships/delete/{id}(id=${membership.id})}" onclick="return confirm('Are you sure?')">Delete</a>
         </td>
     </tr>

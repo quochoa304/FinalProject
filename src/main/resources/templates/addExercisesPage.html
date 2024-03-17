@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Exercises to Membership</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+</head>
+<body class="py-4">
+<div class="container">
+    <h1 class="mb-4">Add Exercises to Membership: <span th:text="${gymMembership.name}"></span></h1>
+    <form th:action="@{/admin/gym-memberships/{membershipId}/add-exercises(membershipId=${gymMembership.id})}" method="post" class="mb-3">
+        <div class="form-group">
+            <label for="exercise-select">Select Exercises</label>
+            <select multiple="multiple" name="exerciseIds" id="exercise-select" class="form-control">
+                <option th:each="exercise : ${availableExercises}" th:value="${exercise.id}" th:text="${exercise.name}"></option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Selected Exercises</button>
+    </form>
+
+    <h2>Existing Exercises in <span th:text="${gymMembership.name}"></span></h2>
+    <ul class="list-group">
+        <li th:each="exercise : ${gymMembership.exercises}" th:text="${exercise.name}" class="list-group-item"></li>
+    </ul>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#exercise-select').select2({
+            theme: 'bootstrap4',
+            placeholder: "Select exercises",
+            allowClear: true
+        });
+    });
+</script>
+</body>
+</html>

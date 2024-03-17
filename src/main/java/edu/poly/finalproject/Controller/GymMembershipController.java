@@ -2,15 +2,16 @@ package edu.poly.finalproject.Controller;
 
 import edu.poly.finalproject.model.Exercise;
 import edu.poly.finalproject.model.GymMembership;
-import edu.poly.finalproject.repository.GymMembershipRepository;
+import edu.poly.finalproject.service.ExerciseService;
 import edu.poly.finalproject.service.GymMembershipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class GymMembershipController {
     @Autowired
     private GymMembershipService gymMembershipService;
     @Autowired
-    private GymMembershipRepository gymMembershipRepository;
+    private ExerciseService exerciseService;
 
     @GetMapping("/admin/gym-memberships")
     public String showGymMembershipPage(Model model) {
@@ -54,14 +55,36 @@ public class GymMembershipController {
         return "redirect:/admin/gym-memberships";
     }
 
-    @PostMapping("/gym-memberships/{membershipId}/add-exercise")
-    public String addExerciseToMembership(@PathVariable Long membershipId, @ModelAttribute Exercise exercise, Model model) {
-        if (!gymMembershipService.existsById(membershipId)) {
-            model.addAttribute("error", "GymMembership không tồn tại.");
-            return "errorPage";
+
+    @GetMapping("/admin/gym-memberships/{id}/add-exercises")
+    public String showAddExercisesPage(@PathVariable Long id, Model model) {
+        GymMembership gymMembership = gymMembershipService.get(id);
+        if (gymMembership == null) {
+            model.addAttribute("error", "GymMembership not found.");
+            return "errorPage"; // Hoặc trang thông báo lỗi tùy chỉnh của bạn
         }
-        gymMembershipService.addExerciseToMembership(membershipId, exercise);
-        return "redirect:/gym-memberships/" + membershipId;
+        List<Exercise> availableExercises = exerciseService.findAllExercises();
+        model.addAttribute("gymMembership", gymMembership);
+        model.addAttribute("availableExercises", availableExercises);
+        return "addExercisesPage"; // Tên file HTML mới để thêm Exercises
     }
+
+    @PostMapping("/admin/gym-memberships/{membershipId}/add-exercises")
+    public String addExercisesToMembership(@PathVariable Long membershipId, @RequestParam List<Long> exerciseIds, RedirectAttributes redirectAttributes) {
+        GymMembership gymMembership = gymMembershipService.get(membershipId);
+        if (gymMembership != null) {
+            List<Exercise> selectedExercises = exerciseService.findAllById(exerciseIds);
+            gymMembership.getExercises().addAll(selectedExercises);
+            gymMembershipService.save(gymMembership);
+            redirectAttributes.addFlashAttribute("success", "Exercises added successfully.");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "GymMembership not found.");
+        }
+        return "redirect:/admin/gym-memberships/" + membershipId + "/add-exercises";
+    }
+
+
+
+
 
 }
