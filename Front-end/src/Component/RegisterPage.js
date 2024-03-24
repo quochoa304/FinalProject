@@ -109,6 +109,11 @@ const RegisterPage = () => {
             />
           </div>
           <button type="submit">Register</button>
+          <div style={{textAlign:'center', color:'white'}}>or</div>
+      <button style={{ backgroundColor: 'gray', color: 'white', cursor: 'pointer' }}
+      onClick={() => window.location.href='/login'}>
+      Login
+      </button>
         </form>
       </div>
     );
