@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // Import CSS trong thư mục src/assets/css
 import '../assets/css/bootstrap.min.css';
 import '../assets/css/font-awesome.css';
@@ -11,42 +11,33 @@ import trainingImage03 from '../assets/images/training-image-03.jpg';
 import trainingImage04 from '../assets/images/training-image-04.jpg';
 // Thay thế đường dẫn với đường dẫn đúng tới hình ảnh và video trong dự án của bạn
 import gymVideo from '../assets/images/gym-video.mp4';
-
-
+import { useNavigate } from 'react-router-dom';
+import Header from './Header';
 const MemberPage = () => {
     const [activeTab, setActiveTab] = useState('tabs-1');
+
 
     // Hàm để thay đổi tab hiện tại
     const changeTab = (tabId) => {
       setActiveTab(tabId);
     };
+
+    const navigate = useNavigate();
+
+
+
+  useEffect(() => {
+    // Kiểm tra xem người dùng đã đăng nhập chưa
+    const isAuthenticated = localStorage.getItem('user'); // Hoặc phương thức kiểm tra đăng nhập khác của bạn
+    if (!isAuthenticated) {
+      // Nếu người dùng chưa đăng nhập, chuyển hướng đến trang đăng nhập
+      navigate('/login', { state: { errorMessage: 'You need to login first' } });
+    }
+  }, [navigate]);
+
   return (
     <div>
-      <header className="header-area header-sticky">
-        <div className="container">
-          <div className="row">
-            <div className="col-12">
-              <nav className="main-nav">
-                <a href="/" className="logo">
-                  GW <em>Fitness</em>
-                </a>
-                <ul className="nav">
-                  <li className="scroll-to-section"><a href="#top" className="active">Home</a></li>
-                  <li className="scroll-to-section"><a href="#features">About</a></li>
-                    <li className="scroll-to-section"><a href="#our-classes">Our Classes</a></li>
-                    <li className="scroll-to-section"><a href="#schedule">Schedule</a></li>
-                    <li className="scroll-to-section"><a href="#caloCalculator">Calories Calculator</a></li>
-                    <li className="main-button"><a href="/registration">Sign Up</a></li>
-                  {/* Thêm các mục menu khác tại đây */}
-                </ul>
-                <a className='menu-trigger'>
-                  <span>Menu</span>
-                </a>
-              </nav>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       <div className="main-banner" id="top">
         <video autoPlay muted loop id="bg-video">

@@ -11,42 +11,26 @@ import trainingImage03 from '../assets/images/training-image-03.jpg';
 import trainingImage04 from '../assets/images/training-image-04.jpg';
 // Thay thế đường dẫn với đường dẫn đúng tới hình ảnh và video trong dự án của bạn
 import gymVideo from '../assets/images/gym-video.mp4';
-
+import useLoading from '../hook/useLoading';
+import '../assets/css/loading.css';
+import Header from './Header';
 
 const HomePage = () => {
     const [activeTab, setActiveTab] = useState('tabs-1');
-
+    const { isLoading, showLoading, hideLoading } = useLoading();
     // Hàm để thay đổi tab hiện tại
     const changeTab = (tabId) => {
       setActiveTab(tabId);
     };
   return (
     <div>
-      <header className="header-area header-sticky">
-        <div className="container">
-          <div className="row">
-            <div className="col-12">
-              <nav className="main-nav">
-                <a href="/" className="logo">
-                  GW <em>Fitness</em>
-                </a>
-                <ul className="nav">
-                  <li className="scroll-to-section"><a href="#top" className="active">Home</a></li>
-                  <li className="scroll-to-section"><a href="#features">About</a></li>
-                    <li className="scroll-to-section"><a href="#our-classes">Our Classes</a></li>
-                    <li className="scroll-to-section"><a href="#schedule">Schedule</a></li>
-                    <li className="scroll-to-section"><a href="#caloCalculator">Calories Calculator</a></li>
-                    <li className="main-button"><a href="/registration">Sign Up</a></li>
-                  {/* Thêm các mục menu khác tại đây */}
-                </ul>
-                <a className='menu-trigger'>
-                  <span>Menu</span>
-                </a>
-              </nav>
-            </div>
-          </div>
-        </div>
-      </header>
+      {isLoading && (
+        <div style={{ textAlign: 'center' }}>
+        <i className="loading-icon fa fa-hourglass-half" aria-hidden="true"></i> {/* Giả sử bạn sử dụng Font Awesome */}
+        <p>Loading...</p>
+      </div>  
+      )}
+      <Header />
 
       <div className="main-banner" id="top">
         <video autoPlay muted loop id="bg-video">
