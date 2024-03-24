@@ -6,6 +6,10 @@ class AuthService {
   login(email, password) {
     return axios.post(API_URL + '/login', { email, password });
   }
+  logout() {
+    return axios.post(API_URL + '/logout');
+  }
+  
 
   register(firstName, lastName, email, password) {
     return axios.post(API_URL + '/registration', {
