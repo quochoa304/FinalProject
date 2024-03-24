@@ -1,0 +1,143 @@
+
+    .choose-fit {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .fit-form {
+        display: flex;
+        flex-direction: column;
+        flex-basis: 40%; /* Điều chỉnh chiều rộng của form */
+        border: 3px solid #ed563b;
+        padding: 5px;
+        height: auto;
+        width: 35vw;
+    }
+
+    .fit-form div {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 10px; /* Khoảng cách giữa các dòng */
+    }
+
+    .fit-form label {
+        width: 40%; /* Điều chỉnh chiều rộng cố định cho label để đảm bảo chúng thẳng lề */
+        text-align: left; /* Đảm bảo label thẳng lề trái */
+    }
+
+    .fit-form input[type="text"], .fit-form select {
+        width: 60%; /* Điều chỉnh chiều rộng cho input */
+        margin-left: 10px; /* Khoảng cách giữa label và input */
+    }
+    .fit-form input[type="radio"] {
+        width: auto; /* Giữ nguyên chiều rộng tự động */
+        margin-left: 10%; /* Loại bỏ khoảng cách lề trái để căn chính xác với các input khác */
+        margin-right: 10px;
+    }
+    .form-group.gender input[type="radio"] + label + input[type="radio"] {
+        margin-left: 5px;
+    }
+
+
+
+
+    .form-group {
+        color: #ed563b;
+        margin-bottom: 15px; /* Add some space between form groups */
+    }
+
+    .form-group.gender label {
+        margin-right: 10px; /* Add space between the radio buttons and their labels */
+    }
+
+    .form-group.gender input[type="radio"] {
+        margin-right: 5px; /* Adjust spacing to your preference */
+    }
+    #svgContainer {
+        margin-right: 10vw;;
+        width: 35vw; /* Chiếm 50% của chiều rộng viewport */
+        height: calc(35vw * (707 / 772)); /* Tính toán chiều cao dựa trên tỷ lệ của SVG */
+        border: 3px solid #ed563b;
+        padding: 3px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden; /* Đảm bảo SVG không vượt ra ngoài container */
+    }
+    #e927jAarS6d1 {
+        opacity: 0.7;
+    }
+    .choose-fit {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    .fit-form {
+        display: flex;
+        flex-direction: column;
+        flex-basis: 40%; /* Điều chỉnh chiều rộng của form */
+        border: 3px solid #ed563b;
+        padding: 5px;
+        height: auto;
+        width: 35vw;
+    }
+
+    .fit-form div {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 10px; /* Khoảng cách giữa các dòng */
+    }
+
+    .fit-form label {
+        width: 40%; /* Điều chỉnh chiều rộng cố định cho label để đảm bảo chúng thẳng lề */
+        text-align: left; /* Đảm bảo label thẳng lề trái */
+    }
+
+    .fit-form input[type="text"], .fit-form select {
+        width: 60%; /* Điều chỉnh chiều rộng cho input */
+        margin-left: 10px; /* Khoảng cách giữa label và input */
+    }
+    .fit-form input[type="radio"] {
+        width: auto; /* Giữ nguyên chiều rộng tự động */
+        margin-left: 10%; /* Loại bỏ khoảng cách lề trái để căn chính xác với các input khác */
+        margin-right: 10px;
+    }
+    .form-group.gender input[type="radio"] + label + input[type="radio"] {
+        margin-left: 5px;
+    }
+
+
+
+
+    .form-group {
+        color: #ed563b;
+        margin-bottom: 15px; /* Add some space between form groups */
+    }
+
+    .form-group.gender label {
+        margin-right: 10px; /* Add space between the radio buttons and their labels */
+    }
+
+    .form-group.gender input[type="radio"] {
+        margin-right: 5px; /* Adjust spacing to your preference */
+    }
+    #svgContainer {
+        margin-right: 10vw;;
+        width: 35vw; /* Chiếm 50% của chiều rộng viewport */
+        height: calc(35vw * (707 / 772)); /* Tính toán chiều cao dựa trên tỷ lệ của SVG */
+        border: 3px solid #ed563b;
+        padding: 3px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden; /* Đảm bảo SVG không vượt ra ngoài container */
+    }
+    #e927jAarS6d1 {
+        opacity: 0.7;
+    }

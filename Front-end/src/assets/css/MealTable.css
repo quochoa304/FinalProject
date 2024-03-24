@@ -1,0 +1,22 @@
+#mealSuggestions {
+    width: 90%; /* 2/3 của màn hình */
+    margin: 0 auto; /* Căn giữa */
+    display: flex; /* Sử dụng Flexbox */
+    flex-wrap: wrap; /* Cho phép các mục chuyển sang hàng mới */
+    justify-content: center; /* Căn giữa các mục theo chiều ngang */
+}
+.mealItem:hover {
+    background-color: #ed563b; /* Màu nền mới khi hover */
+    cursor: pointer; /* Thay đổi con trỏ chuột để báo hiệu có thể tương tác */
+}
+
+.mealItem {
+    flex: 1 1 30%;
+    margin: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+}
+.mealItem img {
+    max-width: 100%; /* Đảm bảo ảnh không vượt quá kích thước của mục */
+    height: auto; /* Giữ tỷ lệ ảnh */
+}
