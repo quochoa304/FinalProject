@@ -1,0 +1,55 @@
+.login-container {
+    background-image: url('../images/—Pngtree—an\ old\ gym\ setting\ with_2667256\ \(1\).jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .login-form {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+  }
+  
+  .login-form h2 {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .login-form label {
+    color: #fff;
+  }
+  
+  .login-form input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+  }
+  
+  .login-form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #f76b1a;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .login-form button:hover {
+    background-color: #e65a00;
+  }
+  
+  .error-message {
+    color: #ff3860;
+    margin: 10px 0;
+  }
+  
