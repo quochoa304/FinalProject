@@ -29,4 +29,6 @@ public class PurchasedMembership {
     private LocalDateTime purchaseDate;
 
     // Constructors, Getters, and Setters
+
+
 }

@@ -1,5 +1,7 @@
 package edu.poly.finalproject.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,10 +30,12 @@ public class GymMembership {
 
 
     @ManyToMany(fetch = FetchType.LAZY)
+    @JsonManagedReference
     @JoinTable(
             name = "membership_exercises",
             joinColumns = @JoinColumn(name = "membership_id"),
             inverseJoinColumns = @JoinColumn(name = "exercise_id")
     )
+    @JsonIgnore
     private Set<Exercise> exercises = new HashSet<>();
 }
