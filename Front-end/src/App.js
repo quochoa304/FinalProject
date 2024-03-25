@@ -6,6 +6,8 @@ import RegisterPage from './Component/RegisterPage';
 import MemberPage from './Component/MemberPage';
 import CaloCalculator from './Component/CaloCalculator';
 import Classes from './Component/Classes';
+import ProfilePage from './Component/ProfilePage';
+import CurrentMembership from './Component/CurrentMembership';
 
 
 
@@ -21,6 +23,8 @@ function App() {
           <Route path="*" element={<h1>Not Found</h1>} />
           <Route path="/caloCalculator" element={<CaloCalculator />} />
           <Route path="/classes" element={<Classes />} />
+          <Route path="/profile" element={<ProfilePage/>} />
+          <Route path="/meme" element={<CurrentMembership/>} />
         </Routes>
       </div>
     </Router>
