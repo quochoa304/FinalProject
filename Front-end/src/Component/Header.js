@@ -2,12 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import AuthService from '../services/AuthService';
 import { useNavigate } from 'react-router-dom';
-import gymVideo from '../assets/images/gym-video.mp4';
+
 const Header = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
       const user = localStorage.getItem('user'); // Giả sử bạn lưu trạng thái đăng nhập ở đây
+      console.log('user', user);
       setIsLoggedIn(!!user);
     }, []);
     const navigate = useNavigate();
@@ -35,7 +36,7 @@ const Header = () => {
                   <li className="scroll-to-section"><a href="#features">About</a></li>
                     <li className="scroll-to-section"><a href="#our-classes">Our Classes</a></li>
                     <li className="scroll-to-section"><a href="#schedule">Schedule</a></li>
-                    <li className="scroll-to-section"><a href="#caloCalculator">Calories Calculator</a></li>
+                    <li className="scroll-to-section"><a href="/caloCalculator">Calories Calculator</a></li>
                     <li className="scroll-to-section">{isLoggedIn ? (
         <a onClick={handleLogout}>Log Out</a>
       ) : (
