@@ -11,10 +11,12 @@ import edu.poly.finalproject.service.UserService;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -44,11 +46,20 @@ public class UserController {
 
 
     @GetMapping("/info")
-    public User getUserInfo() {
+    public Object getUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName(); // Assuming username is the user's email
-        return userRepository.findByEmail(email);
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
+            Map<String, Object> attributes = oauthToken.getPrincipal().getAttributes();
+            // Process and return the user info based on attributes
+            return attributes; // For demo purposes, adapt as needed
+        } else {
+            String email = authentication.getName(); // Traditional login
+            return userRepository.findByEmail(email);
+        }
     }
+
+
 
     @GetMapping("/member")
     public ResponseEntity<?> showBuyAPlanPage() {
@@ -93,7 +104,35 @@ public class UserController {
 
 
     @PostMapping("/change-password")
-    public String changeUserPassword(@RequestBody PasswordChangeRequest passwordChangeRequest) {
+    public ResponseEntity<?> changeUserPassword(@RequestBody PasswordChangeRequest passwordChangeRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: User not found.");
+        }
+
+        if (!passwordEncoder.matches(passwordChangeRequest.getOldPassword(), user.getPassword())) {
+            return ResponseEntity.badRequest().body("Error: Old password is incorrect.");
+        }
+
+        user.setPassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
+        userRepository.save(user);
+        return ResponseEntity.ok("Password successfully changed.");
+    }
+
+
+
+    @Setter
+    @Getter
+    public static class DetailChangeRequest {
+        private String newFirstName;
+        private String newLastName;
+        // Getters and setters
+    }
+    @PostMapping("/change-detail")
+    public String changeUserInformation(@RequestBody DetailChangeRequest detailChangeRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
@@ -102,11 +141,8 @@ public class UserController {
             throw new RuntimeException("User not found.");
         }
 
-        if (!passwordEncoder.matches(passwordChangeRequest.getOldPassword(), user.getPassword())) {
-            return "Error: Old password is incorrect.";
-        }
-
-        user.setPassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
+        user.setFirstName(detailChangeRequest.getNewFirstName());
+        user.setLastName(detailChangeRequest.getNewLastName());
         userRepository.save(user);
         return "Password successfully changed.";
     }
