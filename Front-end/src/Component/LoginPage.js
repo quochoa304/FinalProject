@@ -34,7 +34,6 @@ const LoginPage = () => {
     });
   };
 
-
   const handleSubmit = async (event) => {
     event.preventDefault();
   
@@ -70,6 +69,11 @@ const LoginPage = () => {
   };
 
 
+  const handleGoogleSignIn = () => {
+    // Redirect user to OAuth2 login endpoint
+    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+    
+  };
 
 
   
@@ -106,11 +110,19 @@ const LoginPage = () => {
         />
       </div>
       <button type="submit">Login</button>
+      <div style={{textAlign: 'center', color: 'white'}}>or</div>
+      <button
+        style={{ backgroundColor: '#db4437', color: 'white', cursor: 'pointer' }}
+        onClick={handleGoogleSignIn}
+      >
+        Sign in with Google
+      </button>
       <div style={{textAlign:'center', color:'white'}}>or</div>
       <button style={{ backgroundColor: 'gray', color: 'white', cursor: 'pointer' }}
       onClick={() => window.location.href='/registration'}>
       Register
       </button>
+
     </form>
   </div>
 );
