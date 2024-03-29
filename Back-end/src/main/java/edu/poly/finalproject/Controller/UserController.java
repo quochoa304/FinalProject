@@ -148,4 +148,21 @@ public class UserController {
     }
 
 
+//buy a membership
+        @PostMapping("/purchase-membership")
+    public ResponseEntity<?> purchaseMembership(@RequestBody Map<String, Long> body) {
+        Long membershipId = body.get("membershipId");
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String currentPrincipalName = authentication.getName();
+            User user = userRepository.findByEmail(currentPrincipalName);
+
+            purchasedMembershipService.purchaseMembership(user.getId(), membershipId);
+
+            return ResponseEntity.ok("Membership purchased successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error while purchasing membership: " + e.getMessage());
+        }
+    }
+
 }
