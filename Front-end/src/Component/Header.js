@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import AuthService from '../services/AuthService';
 import { useNavigate } from 'react-router-dom';
+import { GoogleLogout, useGoogleLogout } from 'react-google-login';
+const clientId = '896387674450-36c0ktb6qabai36ol9271dlh2u1at97k.apps.googleusercontent.com';
 
 const Header = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -38,7 +40,16 @@ const Header = () => {
                     <li className="scroll-to-section"><a href="#schedule">Schedule</a></li>
                     <li className="scroll-to-section"><a href="/caloCalculator">Calories Calculator</a></li>
                     <li className="scroll-to-section">{isLoggedIn ? (
-        <a onClick={handleLogout}>Log Out</a>
+                          <GoogleLogout
+                          clientId={clientId}
+                          buttonText="Logout"
+                          onLogoutSuccess={handleLogout}
+                          render={renderProps => (
+                            <a onClick={renderProps.onClick} disabled={renderProps.disabled} className="google-logout-btn">
+                              Logout
+                            </a>
+                          )}
+                        />
       ) : (
         <a href="/registration" className="main-button">Sign Up</a>
       )}</li>
