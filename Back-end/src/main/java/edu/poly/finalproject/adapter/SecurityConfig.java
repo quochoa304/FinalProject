@@ -85,7 +85,7 @@ public class SecurityConfig  {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Cho phép CORS từ localhost:3000
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-CSRF-Token"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
         configuration.setAllowCredentials(true);
         configuration.setExposedHeaders(Arrays.asList("Custom-Header1", "Custom-Header2"));
 
@@ -123,8 +123,8 @@ public class SecurityConfig  {
                                         .anyRequest().authenticated()
                                         .and()
                                         .oauth2Login(oauth2 -> oauth2
-                                                .loginPage("/login")
-                                                .defaultSuccessUrl("/member", true)
+                                                .loginPage("http://localhost:3000/login")
+                                                .defaultSuccessUrl("http://localhost:3000/member", true)
                                                 .failureUrl("/login?error=true")
                                                 .userInfoEndpoint(userInfo -> userInfo
                                                         .userService(oAuth2UserService()) // Define this bean
