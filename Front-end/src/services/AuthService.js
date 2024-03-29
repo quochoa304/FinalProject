@@ -19,6 +19,33 @@ class AuthService {
       password
     });
   }
+
+  async checkEmailExists(email) {
+    try {
+      const response = await axios.get(API_URL + `/user/check-email?email=${email}`);
+      return response.data.exists;
+    } catch (error) {
+      throw error.response.data || 'An unknown error occurred';
+    }
+  }
+
+
+  async registerFromGoogle(googleData) {
+    const { email } = googleData.profileObj;
+    const { familyName, givenName } = googleData.profileObj;
+
+
+        const response = await axios.post(API_URL + '/registration', {
+            firstName: familyName,
+            lastName: givenName,
+            email,
+            password: googleData.profileObj.googleId,
+        });
+        return response.data;
+    
+}
+
+  
 }
 
 export default new AuthService();
