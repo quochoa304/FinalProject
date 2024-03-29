@@ -17,22 +17,34 @@ function ProfilePage() {
   const [message, setMessage] = useState('');
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const[showErrorMessage, setShowErrorMessage] = useState(false);
+  const [membershipPackages, setMembershipPackages] = useState([]);
+  const [showPurchaseMembership, setShowPurchaseMembership] = useState(false);
 
   useEffect(() => {
     axios.get('/user/info')
       .then(response => {
         setUser(response.data);
-        console.log(response.data);
+        console.log("Profile" + response.data);
       })
       .catch(error => console.error('There was an error!', error));
 
     axios.get('/user/member')
       .then(response => {
         setMembershipInfo(response.data);
-        console.log(response.data);
+        console.log( response.data);
+        console.log(response.data.gymMemberships);
+        setMembershipPackages(response.data.gymMemberships);
       })
       .catch(error => console.error('There was an error fetching membership info!', error));
+
   }, []);
+
+  const handleTogglePurchaseMembership = () => {
+    setShowPurchaseMembership(!showPurchaseMembership);
+    setShowChangePassword(false);
+    setShowChangeDetail(false);
+  };
+  
 
   const handleChangeDetail = (e) => {
     e.preventDefault();
@@ -104,6 +116,19 @@ function ProfilePage() {
       setShowErrorMessage(false);
     }, 2000); 
   }
+
+  const handleMembershipSelection = (membershipId) => {
+    axios.post('/user/purchase-membership', { membershipId })
+      .then(response => {
+        // Xử lý thành công, hiển thị thông báo hoặc thực hiện các hành động khác
+        console.log("Membership purchased successfully:", response.data);
+      })
+      .catch(error => {
+        // Xử lý lỗi
+        console.error('Failed to purchase membership:', error);
+      });
+  };
+  
 
   const styles = {
     label: {
@@ -207,7 +232,7 @@ function ProfilePage() {
   <div className="membership-info">
   <div>
     <label>
-      <p style={styles.label}><strong>Membership ID:</strong> {membershipInfo.currentMembership}</p>
+      <p style={styles.label}><strong>Membership Name:</strong> {membershipInfo.currentMembership}</p>
     </label>
   </div>
   <div>
@@ -220,11 +245,42 @@ function ProfilePage() {
       <p style={styles.label}><strong>Purchase Date:</strong> {membershipInfo.purchaseDate ? `${membershipInfo.purchaseDate[0]}-${membershipInfo.purchaseDate[1]}-${membershipInfo.purchaseDate[2]}` : 'Not Available'}</p>
     </label>
   </div>
+  
 </div>
+
+)}
+
+{showPurchaseMembership && (
+  <div className="membership-packages">
+    <h3>Choose Membership Package: </h3>
+ 
+      {membershipPackages.map(membershipPackages => (
+        <li key={membershipPackages.id}>
+          
+          <button onClick={() => handleMembershipSelection(membershipPackages.id)}><span>{membershipPackages.name} - {membershipPackages.price}</span></button>
+        </li>
+      ))}
+
+  </div>
 )}
 
 
+
+
+
+
+
             <br />
+            <button
+  onClick={handleTogglePurchaseMembership}
+  style={{
+    display: showChangePassword || showChangeDetail ? 'none' : 'block',
+    backgroundColor: showPurchaseMembership ? "#ed563b" : "",
+    color: showPurchaseMembership ? "#fff" : "",
+  }}
+>
+  {showPurchaseMembership ? "Cancel" : "Buy A Membership"}
+</button>
             <br />
             <button
   onClick={handleToggleChangePassword}
