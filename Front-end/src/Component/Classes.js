@@ -2,8 +2,43 @@ import React, { useState, useEffect } from 'react';
 import Header from './Header';
 import gymVideo from '../assets/images/gym-video.mp4';
 import '../assets/css/classes.css';
+import axios from 'axios';
 const Classes = () => {
   const [selectedClasses, setSelectedClasses] = useState(new Set());
+  const [exercises, setExercises] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [pathInput, setPathInput] = useState('');
+
+  useEffect(() => {
+    setPathInput(Array.from(selectedClasses).join(', '));
+}, [selectedClasses]);
+
+const filterExercises = (exerciseList, filterValues) => {
+  if (!filterValues.length) return exerciseList; // Trả về tất cả exercises nếu không có giá trị lọc
+
+  return exerciseList.filter(exercise =>
+      filterValues.some(value => exercise.type.includes(value))
+  );
+};
+
+const handleSubmit = (e) => {
+  e.preventDefault();
+  setIsLoading(true);
+
+  axios.get('/user/exercises')
+  .then(response => {
+      const filterValues = pathInput.split(', ').filter(Boolean); // Tách pathInput thành một mảng và loại bỏ giá trị rỗng
+      const filteredExercises = filterExercises(response.data.exercises, filterValues);
+      setExercises(filteredExercises);
+      setIsLoading(false);
+  })
+  .catch(error => {
+      console.error('There was an error!', error);
+      setError('Failed to load exercises');
+      setIsLoading(false);
+  });
+};
 
   useEffect(() => {
     const handleSvgClick = (event) => {
@@ -40,6 +75,7 @@ const Classes = () => {
       }
     };
 
+
     const svgContainer = document.getElementById('svgContainer');
     svgContainer.addEventListener('click', handleSvgClick);
 
@@ -47,6 +83,8 @@ const Classes = () => {
     return () => {
       svgContainer.removeEventListener('click', handleSvgClick);
     };
+
+    
   }, []);
 
   useEffect(() => {
@@ -75,13 +113,14 @@ const Classes = () => {
           </svg>
       </div>
       <div className="fit-form">
+                <form onSubmit={handleSubmit}>
                     <div className="section-heading" style={{display: 'flex', margin:'5px'}}>
                         <h2 style={{fontSize:"Medium"}}>Choose <em>plan</em></h2>
                     </div>
                     <div className="form-group">
-                        <label htmlFor="pathInput">Path:</label>
-                        <input id="pathInput" />
-                    </div>
+                <label htmlFor="pathInput">Path:</label>
+                <input id="pathInput" value={pathInput} readOnly />
+            </div>
                     <div className="form-group">
                         <label htmlFor="eType">Type:</label>
                         <select id="eType">
@@ -100,16 +139,26 @@ const Classes = () => {
                     <div style={{textAlign:'center', display:'flex'}}>
                       <button type="submit" style={{backgroundColor:'orange'}} className="btn btn-primary">Submit</button>
                     </div>
-                    </div>       
-            </div>
-            </div>
-            </div>
+                </form>
+                <ul>
+                {exercises.map((exercise) => (
+                    <li key={exercise.id}>{exercise.name} - {exercise.type}</li>
+                ))}
+                </ul>
+        </div>       
+    </div>
+  </div>
+</div>
+
         </div>
+      
+              
+
+      <br></br>
+      <br></br>
+      <br></br>
 
 
-      <br></br>
-      <br></br>
-      <br></br>
       
     </div>
   );
