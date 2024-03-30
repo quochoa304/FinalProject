@@ -35,7 +35,15 @@ function ProfilePage() {
         console.log(response.data.gymMemberships);
         setMembershipPackages(response.data.gymMemberships);
       })
+      
       .catch(error => console.error('There was an error fetching membership info!', error));
+      if (localStorage.getItem('membershipPurchaseSuccess') === 'true') {
+        // Hiển thị thông báo thành công
+        showSuccessNotification();
+        
+        // Xóa cờ khỏi Local Storage sau khi đã hiển thị thông báo
+        localStorage.removeItem('membershipPurchaseSuccess');
+      }
 
   }, []);
 
@@ -120,14 +128,21 @@ function ProfilePage() {
   const handleMembershipSelection = (membershipId) => {
     axios.post('/user/purchase-membership', { membershipId })
       .then(response => {
-        // Xử lý thành công, hiển thị thông báo hoặc thực hiện các hành động khác
         console.log("Membership purchased successfully:", response.data);
+        
+        // Lưu cờ hoặc thông điệp vào Local Storage
+        localStorage.setItem('membershipPurchaseSuccess', 'true');
+  
+        // Tải lại trang
+        window.location.reload();
       })
       .catch(error => {
-        // Xử lý lỗi
         console.error('Failed to purchase membership:', error);
+        setMessage("This membership is your current membership." );
+        showErrorMessageNotification();
       });
   };
+  
   
 
   const styles = {
@@ -160,151 +175,150 @@ function ProfilePage() {
         </video>
         <div className="video-overlay header-text">
           <div className="caption" style={styles.caption}>
-          <br /><br /><br />
+            <br /><br /><br />
             <h6 style={{ fontSize: 'xx-large' }}>User <em style={{ color: 'red' }}>Profile</em></h6>
             <br />
-            <div className="user-info" >
-              <div>
-                <label>
-                  <p style={styles.label}><strong>First Name:</strong> {user.firstName}</p>
-                </label>
+            {!showPurchaseMembership && (
+              <div className="user-info" >
+                <div>
+                  <label>
+                    <p style={styles.label}><strong>First Name:</strong> {user.firstName}</p>
+                  </label>
+                </div>
+                <div>
+                  <label>
+                    <p style={styles.label}><strong>Last Name:</strong> {user.lastName}</p>
+                  </label>
+                </div>
+                <div>
+                  <label>
+                    <p style={styles.label}><strong>Email:</strong> {user.email}</p>
+                  </label>
+                </div>
               </div>
-              <div>
-                <label>
-                  <p style={styles.label}><strong>Last Name:</strong> {user.lastName}</p>
-                </label>
+            )}
+
+            {showChangePassword && (
+              <div className="change-password-form">
+                <form onSubmit={handleChangePassword}>
+                  <div>
+                    <label style={styles.label}>Old Password:
+                      <input type="password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} required />
+                    </label>
+                  </div>
+                  <div>
+                    <label style={styles.label}>New Password:
+                      <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
+                    </label>
+                  </div>
+                  <div>
+                    <label style={styles.label}>Confirm Password:
+                      <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+                    </label>
+                  </div>
+                  <div>
+                    <button type="submit">Submit New Password</button>
+                  </div>
+                </form>
               </div>
-              <div>
-                <label>
-                  <p style={styles.label}><strong>Email:</strong> {user.email}</p>
-                </label>
+            )}
+
+            {showChangeDetail && (
+              <div className="change-password-form">
+                <form onSubmit={handleChangeDetail}>
+                  <div>
+                    <label style={styles.label}>New firstName:
+                      <input value={newFirstName} onChange={(e) => setNewFirstName(e.target.value)} required />
+                    </label>
+                  </div>
+                  <div>
+                    <label style={styles.label}>New lastName:
+                      <input value={newLastName} onChange={(e) => setNewLastName(e.target.value)} required />
+                    </label>
+                  </div>
+                  <div>
+                    <button type="submit">Submit</button>
+                  </div>
+                </form>
               </div>
-            </div>
+            )}
 
+            {!showChangePassword && !showChangeDetail && membershipInfo && (
+              <div className="membership-info">
+                <div>
+                  <label>
+                    <p style={styles.label}><strong>Membership Name:</strong> {membershipInfo.currentMembership}</p>
+                  </label>
+                </div>
+                <div>
+                  <label>
+                    <p style={styles.label}><strong>Expiry Date:</strong> {membershipInfo.expiryDate ? `${membershipInfo.expiryDate[0]}-${membershipInfo.expiryDate[1]}-${membershipInfo.expiryDate[2]}` : 'Not Available'}</p>
+                  </label>
+                </div>
+                <div>
+                  <label>
+                    <p style={styles.label}><strong>Purchase Date:</strong> {membershipInfo.purchaseDate ? `${membershipInfo.purchaseDate[0]}-${membershipInfo.purchaseDate[1]}-${membershipInfo.purchaseDate[2]}` : 'Not Available'}</p>
+                  </label>
+                </div>
 
+              </div>
 
-{showChangePassword && (
-  <div className="change-password-form">
-  <form onSubmit={handleChangePassword}>
-    <div>
-      <label style={styles.label}>Old Password:
-        <input type="password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} required />
-      </label>
-    </div>
-    <div>
-      <label style={styles.label}>New Password:
-        <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
-      </label>
-    </div>
-    <div>
-      <label style={styles.label}>Confirm Password:
-        <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-      </label>
-    </div>
-    <div>
-      <button type="submit">Submit New Password</button>
-    </div>
-  </form>
-</div>
-)}
+            )}
 
-{showChangeDetail && (
-  <div className="change-password-form">
-  <form onSubmit={handleChangeDetail}>
-    <div>
-      <label style={styles.label}>New firstName:
-        <input  value={newFirstName} onChange={(e) => setNewFirstName(e.target.value)} required />
-      </label>
-    </div>
-    <div>
-      <label style={styles.label}>New lastName:
-        <input value={newLastName} onChange={(e) => setNewLastName(e.target.value)} required />
-      </label>
-    </div>
-    <div>
-      <button type="submit">Submit</button>
-    </div>
-  </form>
-</div>
-)}
+            {showPurchaseMembership && (
+              <div className="membership-info">
+                <h3 style={styles.label}>Choose Membership Package: </h3>
 
-{!showChangePassword && !showChangeDetail && membershipInfo && (
-  <div className="membership-info">
-  <div>
-    <label>
-      <p style={styles.label}><strong>Membership Name:</strong> {membershipInfo.currentMembership}</p>
-    </label>
-  </div>
-  <div>
-    <label>
-      <p style={styles.label}><strong>Expiry Date:</strong> {membershipInfo.expiryDate ? `${membershipInfo.expiryDate[0]}-${membershipInfo.expiryDate[1]}-${membershipInfo.expiryDate[2]}` : 'Not Available'}</p>
-    </label>
-  </div>
-  <div>
-    <label>
-      <p style={styles.label}><strong>Purchase Date:</strong> {membershipInfo.purchaseDate ? `${membershipInfo.purchaseDate[0]}-${membershipInfo.purchaseDate[1]}-${membershipInfo.purchaseDate[2]}` : 'Not Available'}</p>
-    </label>
-  </div>
-  
-</div>
+                {membershipPackages.map(membershipPackages => (
+                  <li key={membershipPackages.id}>
+                    <br/>
+                    <button onClick={() => handleMembershipSelection(membershipPackages.id)}><span>{membershipPackages.name} - {membershipPackages.price}$</span></button>
+                  </li>
+                ))}
 
-)}
-
-{showPurchaseMembership && (
-  <div className="membership-packages">
-    <h3>Choose Membership Package: </h3>
- 
-      {membershipPackages.map(membershipPackages => (
-        <li key={membershipPackages.id}>
-          
-          <button onClick={() => handleMembershipSelection(membershipPackages.id)}><span>{membershipPackages.name} - {membershipPackages.price}</span></button>
-        </li>
-      ))}
-
-  </div>
-)}
-
-
-
-
-
-
-
+              </div>
+            )}
+                <br />
+                <button
+                  onClick={handleTogglePurchaseMembership}
+                  style={{
+                    display: showChangePassword || showChangeDetail ? 'none' : 'block',
+                    backgroundColor: showPurchaseMembership ? "#ed563b" : "",
+                    color: showPurchaseMembership ? "#fff" : "",
+                  }}
+                >
+                  {showPurchaseMembership ? "Cancel" : "Buy A Membership"}
+                </button>
             <br />
-            <button
-  onClick={handleTogglePurchaseMembership}
-  style={{
-    display: showChangePassword || showChangeDetail ? 'none' : 'block',
-    backgroundColor: showPurchaseMembership ? "#ed563b" : "",
-    color: showPurchaseMembership ? "#fff" : "",
-  }}
->
-  {showPurchaseMembership ? "Cancel" : "Buy A Membership"}
-</button>
-            <br />
-            <button
-  onClick={handleToggleChangePassword}
-  style={{
-    display: showChangeDetail ? 'none' : 'block', // Ẩn nút khi nút Change Detail được nhấn
-    backgroundColor: showChangePassword ? "#ed563b" : "",
-    color: showChangePassword ? "#fff" : "",
-  }}
->
-  {showChangePassword ? "Cancel" : "Change Password"}
-</button>
+            {!showPurchaseMembership && (
+              <div>
+                <button
+                  onClick={handleToggleChangePassword}
+                  style={{
+                    display: showChangeDetail ? 'none' : 'block', // Ẩn nút khi nút Change Detail được nhấn
+                    backgroundColor: showChangePassword ? "#ed563b" : "",
+                    color: showChangePassword ? "#fff" : "",
+                  }}
+                >
+                  {showChangePassword ? "Cancel" : "Change Password"}
+                </button>
 
-      <br />
-      <button
-        onClick={handleToggleChangeDetail}
-        style={{
-          display: showChangePassword ? 'none' : 'block', 
-          backgroundColor: showChangeDetail ? "#ed563b" : "",
-          color: showChangeDetail ? "#fff" : "",
-        }}
-      >
-        {showChangeDetail ? "Cancel" : "Change Detail"}
-      </button>
-         
+                <br />
+                <button
+                  onClick={handleToggleChangeDetail}
+                  style={{
+                    display: showChangePassword ? 'none' : 'block',
+                    backgroundColor: showChangeDetail ? "#ed563b" : "",
+                    color: showChangeDetail ? "#fff" : "",
+                    margin: 'auto',
+                  }}
+                >
+                  {showChangeDetail ? "Cancel" : "Change Detail"}
+                </button>
+              </div>
+            )}
+
+
           </div>
         </div>
       </div>
