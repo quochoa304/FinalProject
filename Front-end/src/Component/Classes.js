@@ -26,6 +26,15 @@ const handleSubmit = (e) => {
   e.preventDefault();
   setIsLoading(true);
 
+  //check if pathInput is empty
+  if (!pathInput.trim()) {
+    // Set exercises to an empty array and donot make the API call
+    setExercises([]);
+    setIsLoading(false);
+    setError('Please select at least one muscle group.');
+    return; 
+}
+
   axios.get('/user/exercises')
   .then(response => {
       const filterValues = pathInput.split(', ').filter(Boolean); // Tách pathInput thành một mảng và loại bỏ giá trị rỗng
