@@ -59,6 +59,33 @@ public class UserController {
         }
     }
 
+     @GetMapping("/exercises")
+    public ResponseEntity<?> getAllExercisesForUserMembership() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+
+        PurchasedMembership currentMembership = purchasedMembershipService.findCurrentMembershipByUserId(user.getId());
+        if (currentMembership == null) {
+            return ResponseEntity.ok(Collections.emptyList()); // No current membership, return empty list
+        }
+
+        GymMembership gymMembership = gymMembershipService.get(currentMembership.getMembershipId());
+        if (gymMembership == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Gym membership not found.");
+        }
+
+        // Assuming gymMembership.getExercises() returns a Set<Exercise>
+        Set<Exercise> exercises = gymMembership.getExercises();
+        Map<String, Object> response = new HashMap<>();
+        response.put("exercises", exercises);
+
+        return ResponseEntity.ok(response);
+    }
+
 
 
     @GetMapping("/member")
