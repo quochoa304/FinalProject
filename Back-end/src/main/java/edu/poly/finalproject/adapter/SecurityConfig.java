@@ -123,8 +123,8 @@ public class SecurityConfig  {
                                         .anyRequest().authenticated()
                                         .and()
                                         .oauth2Login(oauth2 -> oauth2
-                                                .loginPage("http://localhost:3000/login")
-                                                .defaultSuccessUrl("http://localhost:3000/member", true)
+                                                .loginPage("/login")
+                                                .defaultSuccessUrl("/member", true)
                                                 .failureUrl("/login?error=true")
                                                 .userInfoEndpoint(userInfo -> userInfo
                                                         .userService(oAuth2UserService()) // Define this bean
@@ -155,6 +155,10 @@ public class SecurityConfig  {
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .logoutSuccessUrl("/login?logout")
                         .permitAll()
+                )
+                .exceptionHandling((exceptionHandling) ->
+                        exceptionHandling
+                                .accessDeniedPage("/")
                 );
         return http.build();
     }
