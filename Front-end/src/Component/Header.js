@@ -34,10 +34,23 @@ const Header = () => {
                   GW <em>Fitness</em>
                 </a>
                 <ul className="nav">
-                  <li className="scroll-to-section"><a href="#top" className="active">Home</a></li>
+                {isLoggedIn ? (
+                     <li className="scroll-to-section"><a href="/" className="active">Home</a></li>
+                  ) : (
+                    <li className="scroll-to-section"><a href="#top" className="active">Home</a></li>
+                  )}
                   <li className="scroll-to-section"><a href="#features">About</a></li>
-                    <li className="scroll-to-section"><a href="#our-classes">Our Classes</a></li>
+                  {isLoggedIn ? (
+                    <li className="scroll-to-section"><a href="/classes">Our Classes</a></li>
+                  ) : (
+                    <li className="scroll-to-section"><a href="/#our-classes">Our Classes</a></li>
+                  )}
+                  {isLoggedIn ? (
+                    <li className="scroll-to-section"><a href="/profile">Profile</a></li>
+                  ) : (
                     <li className="scroll-to-section"><a href="#schedule">Schedule</a></li>
+                  )}
+                    
                     <li className="scroll-to-section"><a href="/caloCalculator">Calories Calculator</a></li>
                     <li className="scroll-to-section">{isLoggedIn ? (
                           <GoogleLogout
