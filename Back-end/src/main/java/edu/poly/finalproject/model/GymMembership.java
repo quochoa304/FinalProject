@@ -28,6 +28,9 @@ public class GymMembership {
     @Column(name = "duration_months")
     private Integer durationMonths;
 
+    @Column(name = "description")
+    private String description;
+
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JsonManagedReference

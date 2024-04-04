@@ -5,86 +5,66 @@ import edu.poly.finalproject.model.GymMembership;
 import edu.poly.finalproject.service.ExerciseService;
 import edu.poly.finalproject.service.GymMembershipService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
 
-@Controller
+@RestController
+@RequestMapping("/admin")
 public class GymMembershipController {
 
     @Autowired
     private GymMembershipService gymMembershipService;
+
     @Autowired
     private ExerciseService exerciseService;
 
-    @GetMapping("/admin/gym-memberships")
-    public String showGymMembershipPage(Model model) {
+    @GetMapping("/gym-memberships")
+    public ResponseEntity<List<GymMembership>> getGymMemberships() {
         List<GymMembership> gymMemberships = gymMembershipService.listAll();
-        model.addAttribute("gymMemberships", gymMemberships);
-        // Add an empty gymMembership object to the model for the form
-        model.addAttribute("gymMembership", new GymMembership());
-        return "adminPage"; // Ensure this page has the form and list to manage gym memberships
+        return ResponseEntity.ok(gymMemberships);
     }
 
-
-    @PostMapping("/admin/gym-memberships/save")
-    public String saveGymMembership(GymMembership gymMembership) {
+    @PostMapping("/gym-memberships")
+    public ResponseEntity<Void> createGymMembership(@RequestBody GymMembership gymMembership) {
         gymMembershipService.save(gymMembership);
-        return "redirect:/admin/gym-memberships";
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/admin/gym-memberships/edit/{id}")
-    public String showEditGymMembershipPage(@PathVariable Long id, Model model) {
+    @GetMapping("/gym-memberships/{id}")
+    public ResponseEntity<GymMembership> getGymMembership(@PathVariable Long id) {
         GymMembership gymMembership = gymMembershipService.get(id);
-        model.addAttribute("gymMembership", gymMembership);
-        List<GymMembership> gymMemberships = gymMembershipService.listAll();
-        model.addAttribute("gymMemberships", gymMemberships); // Thêm để giữ danh sách hiển thị
-        return "adminPage";
+        return ResponseEntity.ok(gymMembership);
     }
 
-
-    @GetMapping("/admin/gym-memberships/delete/{id}")
-    public String deleteGymMembership(@PathVariable(name = "id") Long id) {
+    @DeleteMapping("/gym-memberships/{id}")
+    public ResponseEntity<Void> deleteGymMembership(@PathVariable Long id) {
         gymMembershipService.delete(id);
-        return "redirect:/admin/gym-memberships";
+        return ResponseEntity.ok().build();
     }
 
-
-    @GetMapping("/admin/gym-memberships/{id}/add-exercises")
-    public String showAddExercisesPage(@PathVariable Long id, Model model) {
+    @GetMapping("/gym-memberships/{id}/exercises")
+    public ResponseEntity<List<Exercise>> getExercises(@PathVariable Long id) {
         GymMembership gymMembership = gymMembershipService.get(id);
-        if (gymMembership == null) {
-            model.addAttribute("error", "GymMembership not found.");
-            return "errorPage"; // Hoặc trang thông báo lỗi tùy chỉnh của bạn
-        }
-        List<Exercise> availableExercises = exerciseService.findAllExercises();
-        model.addAttribute("gymMembership", gymMembership);
-        model.addAttribute("availableExercises", availableExercises);
-        return "addExercisesPage"; // Tên file HTML mới để thêm Exercises
+        Set<Exercise> availableExercises = gymMembership.getExercises();
+        return ResponseEntity.ok(new ArrayList<>(availableExercises));
     }
 
-    @PostMapping("/admin/gym-memberships/{membershipId}/add-exercises")
-    public String addExercisesToMembership(@PathVariable Long membershipId, @RequestParam List<Long> exerciseIds, RedirectAttributes redirectAttributes) {
+    @PostMapping("/gym-memberships/{membershipId}/exercises")
+    public ResponseEntity<Void> addExercisesToMembership(@PathVariable Long membershipId, @RequestBody List<Long> exerciseIds) {
         GymMembership gymMembership = gymMembershipService.get(membershipId);
-        if (gymMembership != null) {
-            List<Exercise> selectedExercises = exerciseService.findAllById(exerciseIds);
-            gymMembership.getExercises().addAll(selectedExercises);
-            gymMembershipService.save(gymMembership);
-            redirectAttributes.addFlashAttribute("success", "Exercises added successfully.");
-        } else {
-            redirectAttributes.addFlashAttribute("error", "GymMembership not found.");
-        }
-        return "redirect:/admin/gym-memberships/" + membershipId + "/add-exercises";
+        List<Exercise> selectedExercises = exerciseService.findAllById(exerciseIds);
+        gymMembership.getExercises().addAll(selectedExercises);
+        gymMembershipService.save(gymMembership);
+        return ResponseEntity.ok().build();
     }
 
-
-
-
-
+    @DeleteMapping("/gym-memberships/{membershipId}/exercises/{exerciseId}")
+    public ResponseEntity<Void> removeExerciseFromMembership(@PathVariable Long membershipId, @PathVariable Long exerciseId) {
+        gymMembershipService.removeExerciseFromMembership(membershipId, exerciseId);
+        return ResponseEntity.ok().build();
+    }
 }

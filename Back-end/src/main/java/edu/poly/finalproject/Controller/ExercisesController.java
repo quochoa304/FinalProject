@@ -4,15 +4,12 @@ import edu.poly.finalproject.model.Exercise;
 import edu.poly.finalproject.service.ExerciseService;
 import edu.poly.finalproject.service.GymMembershipService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
+@RequestMapping(path = "/admin") // This means all methods will start with /admin
 public class ExercisesController {
 
     @Autowired
@@ -20,35 +17,43 @@ public class ExercisesController {
     @Autowired
     private GymMembershipService gymMembershipService;
 
-    @GetMapping("/admin/exercises")
-    public String showExercisesPage(Model model) {
-        List<Exercise> exercises = exerciseService.findAllExercises();
-        model.addAttribute("exercisesList", exercises); // Thay đổi ở đây
-        model.addAttribute("exercise", new Exercise()); // Đổi thành "exercise"
-        return "ExercisePage"; // Đảm bảo rằng tên view trùng khớp với tên file HTML
+    // This method returns JSON
+    @GetMapping(path = "/exercises", produces = "application/json")
+    public List<Exercise> showExercisesPage() {
+        return exerciseService.findAllExercises();
     }
 
-    @PostMapping("/admin/exercises/save")
-    public String saveExercises(Exercise exercise) {
-        exerciseService.saveExercise(exercise);
-        return "redirect:/admin/exercises";
+    @PostMapping(path = "/exercises/save", consumes = "application/json")
+    public Exercise saveExercises(@RequestBody Exercise exercise) {
+        return exerciseService.saveExercise(exercise);
     }
 
-    @GetMapping("/admin/exercises/edit/{id}")
-    public String showEditExercisesPage(@PathVariable Long id, Model model) {
+    @GetMapping(path = "/exercises/edit/{id}", produces = "application/json")
+    public Exercise showEditExercisesPage(@PathVariable Long id) {
+        return exerciseService.get(id);
+    }
+
+    @PutMapping(path = "/exercises/update/{id}", consumes = "application/json")
+    public Exercise updateExercise(@PathVariable Long id, @RequestBody Exercise updatedExercise) {
         Exercise exercise = exerciseService.get(id);
-        model.addAttribute("exercise", exercise);
-        List<Exercise> exercises = exerciseService.findAllExercises();
-        model.addAttribute("exercises", exercises); // Thêm để giữ danh sách hiển thị
-        return "ExercisePage";
+
+        if (exercise != null) {
+            exercise.setName(updatedExercise.getName());
+            exercise.setType(updatedExercise.getType());
+            exercise.setDescription(updatedExercise.getDescription());
+
+            return exerciseService.saveExercise(exercise);
+        } else {
+            // Handle case where exercise with given id is not found
+            return null;
+        }
     }
 
-
-    @GetMapping("/admin/exercises/delete/{id}")
-    public String deleteExercises(@PathVariable(name = "id") Long id) {
+    @DeleteMapping(path = "/exercises/delete/{id}")
+    // In RESTful services, 204 No Content is the more appropriate response
+    // status when the server successfully performs a DELETE request.
+    public void deleteExercises(@PathVariable(name = "id") Long id) {
         exerciseService.deleteExercise(id);
-        return "redirect:/admin/exercises";
     }
-
 
 }

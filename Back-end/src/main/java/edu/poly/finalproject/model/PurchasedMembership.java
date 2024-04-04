@@ -28,7 +28,7 @@ public class PurchasedMembership {
     @Column(name ="purchase_date")
     private LocalDateTime purchaseDate;
 
-    // Constructors, Getters, and Setters
-
+    @Column(name ="status")
+    private String status;
 
 }

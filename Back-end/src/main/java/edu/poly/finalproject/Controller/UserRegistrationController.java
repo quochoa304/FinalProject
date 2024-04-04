@@ -1,14 +1,12 @@
 package edu.poly.finalproject.Controller;
 
-import edu.poly.finalproject.Controller.UserRegistrationDto;
+import edu.poly.finalproject.service.EmailExistsException;
 import edu.poly.finalproject.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/registration")
@@ -32,8 +30,15 @@ public class UserRegistrationController {
     }
 
     @PostMapping
-    public String registerUserAccount(@ModelAttribute("user") UserRegistrationDto registrationDto) {
-        userService.save(registrationDto);
-        return "redirect:/registration?success";
+    public Object registerUserAccount(@RequestBody UserRegistrationDto registrationDto) {
+        try {
+            userService.save(registrationDto);
+            return "redirect:/registration?success";
+        } catch (EmailExistsException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
+
+
+
 }
