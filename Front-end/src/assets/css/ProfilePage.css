@@ -1,0 +1,76 @@
+.main-banner .video-overlay {
+    display: flex;
+    justify-content: center;
+    color: white;
+  }
+  
+  .user-info, .membership-info, .change-password-form {
+    margin: auto;
+    padding: 20px;
+    background: rgba(250, 250, 250, 0.1);
+    color: rgb(255, 255, 255); /* Text color */
+    border: #ed563b 1px solid;
+    width: 80%;
+  }
+  
+  button {
+    background-color: #ed563b; /* Button background */
+    color: white; /* Button text color */
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  input[type="password"] {
+    margin: 5px 0;
+  }
+
+  .success-notification {
+    position: fixed; /* Định vị cố định để đè lên các phần tử khác và luôn hiển thị trên cùng */
+    top: 0; /* Khoảng cách từ cạnh trên của viewport */
+    right: 0; /* Khoảng cách từ cạnh phải của viewport */
+    width: 20%; /* Chiều dài mặc định */
+    height: 20px; /* Chiều cao */
+    padding: 40px;
+    background-color: #28a745; /* Màu nền xanh lá */
+    color: #fff; /* Màu chữ trắng */
+    font-weight: bold; /* Chữ đậm */
+    display: flex; /* Sử dụng flexbox để căn giữa nội dung */
+    align-items: center; /* Căn giữa nội dung theo chiều dọc */
+    justify-content: center; /* Căn giữa nội dung theo chiều ngang */
+    z-index: 1000; /* Đảm bảo thông báo nằm trên cùng so với các phần tử khác */
+  }
+  
+  /* Truy vấn phương tiện cho màn hình có chiều rộng dưới 355px */
+  @media (max-width: 355px) {
+    .success-notification {
+      width: 100%; /* Chiều dài được đặt là 100% */
+      padding: 40px; /* Giảm padding cho màn hình nhỏ */
+    }
+  }
+
+  .error-notification {
+    position: fixed; /* Định vị cố định để đè lên các phần tử khác và luôn hiển thị trên cùng */
+    top: 0; /* Khoảng cách từ cạnh trên của viewport */
+    right: 0; /* Khoảng cách từ cạnh phải của viewport */
+    width: 20%; /* Chiều dài mặc định */
+    height: 20px; /* Chiều cao */
+    padding: 40px;
+    background-color: #c40e08; /* Màu nền xanh lá */
+    color: #fff; /* Màu chữ trắng */
+    font-weight: bold; /* Chữ đậm */
+    display: flex; /* Sử dụng flexbox để căn giữa nội dung */
+    align-items: center; /* Căn giữa nội dung theo chiều dọc */
+    justify-content: center; /* Căn giữa nội dung theo chiều ngang */
+    z-index: 1000; /* Đảm bảo thông báo nằm trên cùng so với các phần tử khác */
+  }
+  
+  /* Truy vấn phương tiện cho màn hình có chiều rộng dưới 355px */
+  @media (max-width: 355px) {
+    .error-notification {
+      width: 100%; /* Chiều dài được đặt là 100% */
+      padding: 40px; /* Giảm padding cho màn hình nhỏ */
+    }
+  }
+  
+  

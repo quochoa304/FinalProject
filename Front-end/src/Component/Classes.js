@@ -3,12 +3,30 @@ import Header from './Header';
 import gymVideo from '../assets/images/gym-video.mp4';
 import '../assets/css/classes.css';
 import axios from 'axios';
+import tabsFirstIcon from '../assets/images/tabs-first-icon.png';
+import trainingImage01 from '../assets/images/training-image-01.jpg';
+import trainingImage02 from '../assets/images/training-image-02.jpg';
+import trainingImage03 from '../assets/images/training-image-03.jpg';
+import trainingImage04 from '../assets/images/training-image-04.jpg';
 const Classes = () => {
   const [selectedClasses, setSelectedClasses] = useState(new Set());
   const [exercises, setExercises] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [pathInput, setPathInput] = useState('');
+  const token = localStorage.getItem('Authorization');
+  const [activeTab, setActiveTab] = useState('tabs-1');
+  const changeTab = (tabId) => {
+    setActiveTab(tabId);
+  };
+  const [visibleItems, setVisibleItems] = useState(5);
+
+  const handleShowMore = () => {
+      setVisibleItems(prevVisibleItems => prevVisibleItems + 5);
+  };
+  const handleCollapse = () => {
+    setVisibleItems(5);
+};
 
   useEffect(() => {
     setPathInput(Array.from(selectedClasses).join(', '));
@@ -35,7 +53,11 @@ const handleSubmit = (e) => {
     return; 
 }
 
-  axios.get('/user/exercises')
+  axios.get('http://localhost:8000/user/exercises', {
+    headers: {
+        'Authorization': token
+    }
+})
   .then(response => {
       const filterValues = pathInput.split(', ').filter(Boolean); // Tách pathInput thành một mảng và loại bỏ giá trị rỗng
       const filteredExercises = filterExercises(response.data.exercises, filterValues);
@@ -65,7 +87,6 @@ const handleSubmit = (e) => {
         const currentFill = event.target.getAttribute('fill');
         const isSelected = currentFill === '#ff0000';
         const newFill = isSelected ? '#e1cfab' : '#ff0000';
-
         // Toggle color for all paths with the same class
         document.querySelectorAll(`path[class="${clickedClass}"]`).forEach(path => {
           path.setAttribute('fill', newFill);
@@ -149,23 +170,116 @@ const handleSubmit = (e) => {
                       <button type="submit" style={{backgroundColor:'orange'}} className="btn btn-primary">Submit</button>
                     </div>
                 </form>
-                <ul>
-                {exercises.map((exercise) => (
-                    <li key={exercise.id}>{exercise.name} - {exercise.type}</li>
-                ))}
-                </ul>
+
         </div>       
     </div>
   </div>
 </div>
 
         </div>
+        <br></br>
+      <br></br>
+      <br></br>
+
+        <section className="section" id="our-classes">
+          
+      <div className="container">
+
+      <div>  
+    <ul className="list-group" style={{ listStyle: 'none', padding: 0 }}>
+        {exercises.slice(0, visibleItems).map((exercise) => (
+            <li key={exercise.id} className="list-group-item exercise-item" style={{ display: 'flex',alignItems: 'center', padding: '10px', marginBottom:'5px' }}>
+                <div className="holder" style={{ marginRight: '20px' }}></div>
+                <img
+                    src="https://i.pinimg.com/originals/b1/31/66/b13166afbca01eb6abf94e6b84f65a2e.gif"
+                    alt={exercise.name}
+                    className="exercise-image"
+                    style={{ width: '100px', height: '100px', marginRight: '20px' }}
+                />
+                <div className="exercise-info" style={{ flexGrow: 1, fontSize: '18px', fontWeight: 'bold', display: 'flex', flexDirection: 'column' }}>
+                    <div className="exercise-name" style={{ textAlign: 'center' }}>{exercise.name} - {exercise.type}</div>
+                </div>
+            </li>
+        ))}
+    </ul>
+    <br></br>
+    {visibleItems <= exercises.length ? (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+            <button style={{ marginRight: '10px' }} onClick={handleShowMore}>See more</button>
+            {visibleItems > 5 && <button onClick={handleCollapse}>Collapse</button>}
+        </div>
+    ) : 
+    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+
+{visibleItems > 5 && <button onClick={handleCollapse}>Collapse</button>}
+    </div>
+    }
+</div>
+
+<br></br>
+                <br></br>
+      <br></br>
+        {/* Nội dung còn lại giống như trước */}
+        <div className="row" id="tabs">
+          <div className="col-lg-4">
+          <ul>
+              <li><a onClick={() => setActiveTab('tabs-1')}><img src={tabsFirstIcon} alt="" />First Training Class</a></li>
+              <li><a onClick={() => setActiveTab('tabs-2')}><img src={tabsFirstIcon} alt="" />Second Training Class</a></li>
+              <li><a onClick={() => setActiveTab('tabs-3')}><img src={tabsFirstIcon} alt="" />Third Training Class</a></li>
+              <li><a onClick={() => setActiveTab('tabs-4')}><img src={tabsFirstIcon} alt="" />Fourth Training Class</a></li>
+            </ul>
+          </div>
+          <div className="col-lg-8">
+          <section className='tabs-content'>
+              {activeTab === 'tabs-1' && (
+                <article id='tabs-1'>
+                  <img src={trainingImage01} alt="First Class" />
+                  <h4>First Training Class</h4>
+                  <p>Phasellus convallis mauris sed elementum vulputate. Donec posuere leo sed dui eleifend hendrerit. Sed suscipit suscipit erat, sed vehicula ligula. Aliquam ut sem fermentum sem tincidunt lacinia gravida aliquam nunc. Morbi quis erat imperdiet, molestie nunc ut, accumsan diam.</p>
+                  <div className="main-button">
+                  <a href="/member">View Schedule</a>
+                  </div>
+                </article>
+              )}
+              {activeTab === 'tabs-2' && (
+                <article id='tabs-2'>
+                  <img src={trainingImage02} alt="Second Training" />
+                  <h4>Second Training Class</h4>
+                  <p>Integer dapibus, est vel dapibus mattis, sem mauris luctus leo, ac pulvinar quam tortor a velit. Praesent ultrices erat ante, in ultricies augue ultricies faucibus. Nam tellus nibh, ullamcorper at mattis non, rhoncus sed massa. Cras quis pulvinar eros. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+                  <div className="main-button">
+                    <a href="/member">View Schedule</a>
+                  </div>
+                </article>
+              )}
+              {activeTab === 'tabs-3' && (
+                <article id='tabs-3'>
+                  <img src={trainingImage03} alt="Third Class" />
+                  <h4>Third Training Class</h4>
+                  <p>Fusce laoreet malesuada rhoncus. Donec ultricies diam tortor, id auctor neque posuere sit amet. Aliquam pharetra, augue vel cursus porta, nisi tortor vulputate sapien, id scelerisque felis magna id felis. Proin neque metus, pellentesque pharetra semper vel, accumsan a neque.</p>
+<div className="main-button">
+<a href="/member">View Schedule</a>
+</div>
+</article>
+)}
+{activeTab === 'tabs-4' && (
+<article id='tabs-4'>
+<img src={trainingImage04} alt="Fourth Training" />
+<h4>Fourth Training Class</h4>
+<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aenean ultrices elementum odio ac tempus. Etiam eleifend orci lectus, eget venenatis ipsum commodo et.</p>
+<div className="main-button">
+<a href="/member">View Schedule</a>
+</div>
+</article>
+)}
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
       
               
 
-      <br></br>
-      <br></br>
-      <br></br>
+
 
 
       

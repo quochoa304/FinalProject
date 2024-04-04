@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import '../assets/css/login.css';
 import '../assets/css/loading.css';
 import useLoading from '../hook/useLoading';
@@ -16,18 +16,30 @@ function LoginPage() {
   });
 
   const location = useLocation();
-
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setMessage] = useState('');
+  const [googleEmail, setGoogleEmail] = useState('');
+  const [googleId, setGoogleId] = useState('');
+
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (location.state && location.state.errorMessage) {
-      setErrorMessage(location.state.errorMessage);
+  if (location.state && location.state.errorMessage) {
+    setErrorMessage(location.state.errorMessage);
+  } else {
+    // Nếu không có thông điệp lỗi từ trang trước, kiểm tra URL parameters
+    const searchParams = new URLSearchParams(location.search);
+    const errorMessageParam = searchParams.get('errorMessage');
+    if (errorMessageParam) {
+      setErrorMessage(errorMessageParam);
     }
-    if (location.state && location.state.successMessage) {
-      setMessage(location.state.successMessage);
-    }
+  }
+  if (location.state && location.state.successMessage) {
+    setMessage(location.state.successMessage);
+  }
   }, [location.state]);
 
   const handleChange = (event) => {
@@ -40,33 +52,41 @@ function LoginPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+  
+    // Kiểm tra xem email có phải là "admin@gmail.com" không
+   
+      try {
+          const response = await fetch('http://localhost:8000/authenticate', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ username, password })
+          });
+          console.log('Server response:', response.headers); // Log the full response
+          
+          if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) {
+              throw new Error('Login failed');
+          }
+  
+          const data = await response.json();
+     
+          localStorage.setItem('Authorization','Bearer '+ data.token);
+  
+          localStorage.setItem('user', 'true');
+          console.log('Login successful:', data.token);
+          // window.location.href = '/profile';
+          navigate("/profile");
+  
+          // Redirect to the main page or the requested page
+          
 
-    const formData = new FormData();
-    formData.append('username', credentials.email);
-    formData.append('password', credentials.password);
-
-    try {
-      const response = await fetch('http://localhost:8080/login', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        console.log('Login successful');
-        localStorage.setItem('user', 'true');
-        window.location.href = '/member';
-      } else {
-        console.error('Login failed');
-        const errorData = await response.json();
-        console.error('Login failed:', errorData.error);
-        setErrorMessage(errorData.error || 'An unknown error occurred');
-        setMessage('');
+      } catch (error) {
+          console.error('Login error:', error);
       }
-    } catch (error) {
-      console.error('There was an error!', error);
-    }
+
   };
+  
 
   const onSuccess = async (googleData) => {
     console.log('Login Success: currentUser:', googleData.profileObj.googleId);
@@ -78,31 +98,40 @@ function LoginPage() {
       setMessage('Registration successful');
       setErrorMessage('');
     } catch (error) {
-      const formData = new FormData();
-      formData.append('username', googleData.profileObj.email);
-      formData.append('password', googleData.profileObj.googleId);
-
       try {
-        const response = await fetch('http://localhost:8080/login', {
-          method: 'POST',
-          body: formData,
-          credentials: 'include',
-        });
-
-        if (response.ok) {
-          console.log('Login successful');
+        console.log(googleEmail, googleId);
+          const response = await fetch('http://localhost:8000/authenticate', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ 
+                username: googleData.profileObj.email, 
+                password: googleData.profileObj.googleId 
+              })
+          });
+          console.log('Server response:', response.headers); // Log the full response
+          
+          if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) {
+              throw new Error('Login failed');
+              
+          }
+  
+          const data = await response.json();
+     
+          localStorage.setItem('Authorization','Bearer '+ data.token);
+  
           localStorage.setItem('user', 'true');
-          window.location.href = '/member';
-        } else {
-          console.error('Login failed');
-          const errorData = await response.json();
-          console.error('Login failed:', errorData.error);
-          setErrorMessage(errorData.error || 'An unknown error occurred');
-          setMessage('');
+          navigate("/profile");
+  
+          // Redirect to the main page or the requested page
+          
+          console.log('Login successful:', data.token);
+        } catch (error) {
+          console.error('Login error:', error);
+          setErrorMessage('');
+          setMessage('Press "Login" to continue.');
         }
-      } catch (error) {
-        console.error('There was an error!', error);
-      }
     }
   };
 
@@ -124,23 +153,11 @@ function LoginPage() {
         {successMessage && <div className="success-message" style={{ color: 'green' }}>{successMessage}</div>}
         <div>
           <label>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={credentials.email}
-            onChange={handleChange}
-            required
-          />
+          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
         </div>
         <div>
           <label>Password:</label>
-          <input
-            type="password"
-            name="password"
-            value={credentials.password}
-            onChange={handleChange}
-            required
-          />
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </div>
         <button type="submit">Login</button>
         <div style={{ textAlign: 'center', color: 'white' }}>or</div>

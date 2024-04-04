@@ -9,7 +9,7 @@ const Header = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
-      const user = localStorage.getItem('user'); // Giả sử bạn lưu trạng thái đăng nhập ở đây
+      const user = localStorage.getItem('user'); 
       console.log('user', user);
       setIsLoggedIn(!!user);
     }, []);

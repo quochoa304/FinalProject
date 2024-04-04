@@ -48,6 +48,7 @@ const RegisterPage = () => {
               } else {
                   setErrorMessage('Email already exists. Please use another email.');
                   setSuccessMessage('');
+                  console.error('Something went wrong!', error);
               }
           });
   }

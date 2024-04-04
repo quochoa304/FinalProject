@@ -22,49 +22,47 @@ function ProfilePage() {
   const[showErrorMessage, setShowErrorMessage] = useState(false);
   const [membershipPackages, setMembershipPackages] = useState([]);
   const [showPurchaseMembership, setShowPurchaseMembership] = useState(false);
+  const token = localStorage.getItem('Authorization');
 
   useEffect(() => {
-    axios.get('/user/info')
-      .then(response => {
-        setUser(response.data);
-        if(response.data.email == "admin@gmail.com"){
-          handleLogout();
-          
+    
+    if (!token) {
+      // Nếu chưa đăng nhập, chuyển hướng về trang login
+      navigate('/login?errorMessage=You need to login first');
+      return; // Dừng việc tiếp tục thực thi các công việc khác trong useEffect
+    }
+    axios.get('http://localhost:8000/user/info', {
+        headers: {
+            'Authorization': token
         }
-      })
-      .catch(error => console.error('There was an error!', error));
-  
-    axios.get('/user/member')
-      .then(response => {
+    })
+    .then(response => {
+        setUser(response.data);
+
+    })
+    .catch(error => console.error('There was an error!', error));
+
+    axios.get('http://localhost:8000/user/member', {
+        headers: {
+            'Authorization': token
+        }
+    })
+    .then(response => {
         setMembershipInfo(response.data);
         console.log(response.data);
         console.log(response.data.gymMemberships);
         setMembershipPackages(response.data.gymMemberships);
-      })
-      .catch(error => console.error('There was an error fetching membership info!', error));
-    
+    })
+    .catch(error => console.error('There was an error fetching membership info!', error));
+
     if (localStorage.getItem('membershipPurchaseSuccess') === 'true') {
-      // Hiển thị thông báo thành công
-      showSuccessNotification();
-      
-      // Xóa cờ khỏi Local Storage sau khi đã hiển thị thông báo
-      localStorage.removeItem('membershipPurchaseSuccess');
+        showSuccessNotification();
+        localStorage.removeItem('membershipPurchaseSuccess');
     }
-  }, []);
+}, []);
+
   const navigate = useNavigate();
-  // Đảm bảo hàm handleLogout có thể truy cập được AuthService và navigate
-  const handleLogout = async () => {
-    try {
-      await AuthService.logout();
-      navigate('/login', { state: { errorMessage: 'You need to login first!' } });
-      localStorage.removeItem('user');
-      // Bạn cũng nên xóa 'userInfo' từ localStorage nếu bạn lưu trữ nó
-      localStorage.removeItem('userInfo');
-    } catch (error) {
-      console.error('Logout failed', error);
-    }
-  };
-  
+
 
   const handleTogglePurchaseMembership = () => {
     setShowPurchaseMembership(!showPurchaseMembership);
@@ -76,8 +74,15 @@ function ProfilePage() {
 
   const handleChangeDetail = (e) => {
     e.preventDefault();
-    axios.post('/user/change-detail', { newFirstName, newLastName })
+    axios.post('http://localhost:8000/user/change-detail', { newFirstName, newLastName }, {
+      headers: {
+          'Authorization': token
+      },
+
+    })
+
       .then(response => {
+
         setUser(prevState => ({
           ...prevState,
           firstName: newFirstName,
@@ -104,7 +109,11 @@ function ProfilePage() {
       return;
     }
 
-    axios.post('/user/change-password', { oldPassword, newPassword })
+    axios.post('http://localhost:8000/user/change-password', { oldPassword, newPassword }, {
+      headers: {
+          'Authorization': token
+      }
+    })
     .then(response => {
       // Kiểm tra nội dung phản hồi để xác định xem có lỗi không
       if (response.data.startsWith("Error:")) {
@@ -146,7 +155,11 @@ function ProfilePage() {
   }
 
   const handleMembershipSelection = (membershipId) => {
-    axios.post('/user/purchase-membership', { membershipId })
+    axios.post('http://localhost:8000/user/purchase-membership', { membershipId }, {
+      headers: {
+          'Authorization': token
+      }
+    })
       .then(response => {
         console.log("Membership purchased successfully:", response.data);
         

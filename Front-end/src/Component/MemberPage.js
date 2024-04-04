@@ -18,7 +18,9 @@ import Header from './Header';
 const MemberPage = () => {
     const [activeTab, setActiveTab] = useState('tabs-1');
 
-
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [user, setUser] = useState(null);
     // Hàm để thay đổi tab hiện tại
     const changeTab = (tabId) => {
       setActiveTab(tabId);
@@ -28,14 +30,37 @@ const MemberPage = () => {
 
 
 
-  useEffect(() => {
-    // Kiểm tra xem người dùng đã đăng nhập chưa
-    const isAuthenticated = localStorage.getItem('user'); // Hoặc phương thức kiểm tra đăng nhập khác của bạn
-    if (!isAuthenticated) {
-      // Nếu người dùng chưa đăng nhập, chuyển hướng đến trang đăng nhập
-      navigate('/login', { state: { errorMessage: 'You need to login first' } });
-    }
-  }, [navigate]);
+    useEffect(() => {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+          // No token found, redirect to login page
+          window.location.href = '/login';
+          return;
+      }
+
+      fetch('http://localhost:8000/authenticate', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+          }
+      })
+      .then(response => {
+          if (!response.ok) {
+              throw new Error('Authentication failed');
+          }
+          return response.json();
+      })
+      .then(data => {
+          setUser(data.user);
+          setLoading(false);
+      })
+      .catch(error => {
+          setError('Authentication failed');
+          setLoading(false);
+      });
+  }, []);
 
   return (
     <div>

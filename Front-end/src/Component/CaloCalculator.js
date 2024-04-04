@@ -12,13 +12,17 @@ function CaloCalculator() {
 
   async function suggestMeals() {
     const selectedFood = document.getElementById("foodInput").value;
-
+    const calories = encodeURIComponent(document.getElementById("calories").value); // Ví dụ: 1900
     const mealTypeElement = document.getElementById("mealType");
     const mealType = encodeURIComponent(mealTypeElement.value);
 
     const dietTypes = document.getElementsByName("fav_language");
 
     const calo = encodeURIComponent(document.getElementById("calories").value);
+
+    const fatValue = parseFloat(document.getElementById("fat").value);
+    const carbValue = parseFloat(document.getElementById("cab").value);
+    const proValue = parseFloat(document.getElementById("pro").value);
 
     const mealSuggestions = document.getElementById("mealSuggestions");
     mealSuggestions.innerHTML = ""; // Clear previous suggestions
@@ -31,10 +35,17 @@ function CaloCalculator() {
     if (mealType) queryParams.push(`mealType=${mealType}`);
     if (calo) queryParams.push(`calories=${calo}`);
 
-    const apiUrl = `https://api.edamam.com/search?${queryParams.join('&')}&app_id=${appId}&app_key=${appKey}`;
+
+    //const apiUrl = `https://api.edamam.com/search?${queryParams.join('&')}&app_id=${appId}&app_key=${appKey}`;
+    let apiUrl = `https://api.edamam.com/api/recipes/v2?type=public&q=${selectedFood}&app_id=${appId}&app_key=${appKey}&diet=low-fat&mealType=${mealType}&calories=${calories}`;
+    apiUrl += `&nutrients%5BCHOCDF%5D=${fatValue-10}-${fatValue+10}`;
+    apiUrl += `&nutrients%5BFAT%5D=${carbValue}`;
+    apiUrl += `&nutrients%5BPROCNT%5D=${proValue}`;
+
     try {
         const response = await fetch(apiUrl);
         const data = await response.json();
+        console.log(data);
 
         // Extract meals from the API response
         const meals = data.hits.map(hit => ({
@@ -44,7 +55,7 @@ function CaloCalculator() {
             carb: hit.recipe.totalNutrients.CHOCDF.quantity,
             totalCalories: hit.recipe.calories,
             serving: hit.recipe.yield,
-
+            ingredientLines: hit.recipe.ingredientLines,
             image: hit.recipe.image
         }));
 
@@ -167,7 +178,7 @@ function CaloCalculator() {
           <div className="caption">
             <br></br>
             <br></br>
-            <h6 id="slogan">work harder, get stronger</h6>
+
             <h2>Calo <em>calculator</em></h2>
             <h6>
               <form onSubmit={handleSubmit}>
@@ -338,6 +349,19 @@ function CaloCalculator() {
                   <label style={styles.label} htmlFor="calories">Calories</label>
                   <input style={styles.input} type="text" id="calories" value={result.baseCalo} />
                 </div>
+                <div style={styles.formControl}>
+                  <label style={styles.label} htmlFor="fat">Fat</label>
+                  <input style={styles.input} type="text" id="fat" value={result.fat} />
+                </div>
+                <div style={styles.formControl}>
+                  <label style={styles.label} htmlFor="cab">Carbohydrate</label>
+                  <input style={styles.input} type="text" id="cab" value={result.carb} />
+                </div>
+                <div style={styles.formControl}>
+                  <label style={styles.label} htmlFor="pro">Protein</label>
+                  <input style={styles.input} type="text" id="pro" value={result.protein} />
+                </div>
+
 
                 <br></br>
                 <div style={styles.button}>
