@@ -3,8 +3,8 @@ import axios from 'axios';
 import Header from './Header';
 import gymVideo from '../assets/images/gym-video.mp4';
 import '../assets/css/ProfilePage.css';
-import AuthService from '../services/AuthService';
 import { useNavigate } from 'react-router-dom';
+
 
 
 function ProfilePage() {
@@ -23,8 +23,21 @@ function ProfilePage() {
   const [membershipPackages, setMembershipPackages] = useState([]);
   const [showPurchaseMembership, setShowPurchaseMembership] = useState(false);
   const token = localStorage.getItem('Authorization');
-
+const [priceDifference, setPriceDifference] = useState(0);
+  
   useEffect(() => {
+    const url = window.location.href;
+  if (checkPaymentStatus(url)) {
+    // Nếu thanh toán thành công, thực hiện hàm buyMembership với selectedMembership.id từ localStorage
+    const storedMembership = localStorage.getItem('selectedMembership');
+    if (storedMembership) {
+      const selectedMembership = JSON.parse(storedMembership);
+      window.location.href = '/profile';
+      setMessage("Membership purchased successfully.");
+      handleMembershipSelection(selectedMembership.id);
+    } else {
+      console.error('No selected membership found in localStorage');
+    }}
     
     if (!token) {
       // Nếu chưa đăng nhập, chuyển hướng về trang login
@@ -165,7 +178,8 @@ function ProfilePage() {
         
         // Lưu cờ hoặc thông điệp vào Local Storage
         localStorage.setItem('membershipPurchaseSuccess', 'true');
-  
+        localStorage.removeItem('selectedMembership');
+        localStorage.removeItem('upgradeMembership');
         // Tải lại trang
         window.location.reload();
       })
@@ -180,13 +194,91 @@ function ProfilePage() {
 
   const selectMembership = (membership) => {
     setSelectedMembership(membership);
+    console.log('Selected membership:', membership.price);
+    if (membershipInfo.currentMembership === membership.name) {
+      setMessage("This membership is your current membership.");
+      showErrorMessageNotification();
+      setSelectedMembership(null);
+    } else if (membership.price < membershipInfo.price) {
+      setMessage("You can't downgrade your membership.");
+      showErrorMessageNotification();
+      setSelectedMembership(null);
+    } else if (membership.price > membershipInfo.price) {
+      const newPriceDifference = membership.price - membershipInfo.price;
+      console.log('Curent membership:', membershipInfo.price);
+      console.log('Need pay membership:', newPriceDifference);
+      const isConfirmed = window.confirm(`You will need to pay an additional $${newPriceDifference} for this membership upgrade. Do you want to proceed?`);
+      if (isConfirmed) {
+        setMessage(`You've upgraded your membership!`);
+        const upgradedMembership = { ...membership }; // Tạo bản sao của membership
+        upgradedMembership.price = newPriceDifference; // Thay đổi giá trị của bản sao
+        localStorage.removeItem('selectedMembership'); // Xóa bản sao cũ khỏi localStorage
+        localStorage.setItem('upgradeMembership', JSON.stringify(upgradedMembership)); // Lưu bản sao vào localStorage
+        setPriceDifference(newPriceDifference); // Cập nhật lại giá trị của priceDifference
+      } else {
+        setSelectedMembership(null);
+      }
+    } else {
+      localStorage.setItem('selectedMembership', JSON.stringify(membership));
+    }
   };
-
-  const buyMembership = () => {
-    handleMembershipSelection(selectedMembership.id);
-  };
-
   
+  
+  
+
+  const handlePayButtonClick = async () => {
+    try {
+      let priceInVND;
+      const upgradeMembershipStr = localStorage.getItem('upgradeMembership');
+      if (upgradeMembershipStr) {
+        const upgradeMembership = JSON.parse(upgradeMembershipStr);
+        priceInVND = upgradeMembership.price * 24000;
+      } else if (selectedMembership && selectedMembership.price !== undefined) {
+        priceInVND = selectedMembership.price * 24000;
+      } else {
+        priceInVND = priceDifference * 24000; // Sử dụng giá chênh lệch nếu đã đồng ý nâng cấp gói thành viên
+      }
+  
+      const response = await axios.post('http://localhost:8000/pay', { membershipPrice: priceInVND }, {
+        headers: {
+          'Authorization': token
+        }
+      });
+      const { data } = response;
+  
+      // Truy cập URL thanh toán
+      window.location.href = data;
+    } catch (error) {
+      console.error('Error occurred while making payment:', error);
+    }
+  };
+  
+  
+  
+
+
+  const checkPaymentStatus = (url) => {
+    // Phân tích URL để lấy các tham số
+    const urlParts = url.split('?');
+    if (urlParts.length < 2) {
+      // URL không có tham số
+      return false;
+    }
+    const queryString = urlParts[1];
+  
+    // Phân tích query string để trích xuất giá trị của ResponseCode
+    const params = {};
+    queryString.split('&').forEach((param) => {
+      const [key, value] = param.split('=');
+      params[key] = value;
+    });
+  
+    // Lấy giá trị của ResponseCode
+    const vnp_ResponseCode = params['vnp_ResponseCode'];
+  
+    // Kiểm tra ResponseCode để xác định trạng thái thanh toán
+    return vnp_ResponseCode === '00'; // Trả về true nếu thành công, ngược lại trả về false
+  };
   
 
   const styles = {
@@ -336,7 +428,7 @@ function ProfilePage() {
         <br></br>
         <p style={styles.label}>{selectedMembership.description}</p>
         <br></br>
-        <button onClick={buyMembership}>Buy this membership</button>
+        <button onClick={handlePayButtonClick}>Buy this membership</button>
       </div>
     )}
                 <br />
