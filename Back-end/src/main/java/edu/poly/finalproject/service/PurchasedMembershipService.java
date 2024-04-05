@@ -33,10 +33,12 @@ public class PurchasedMembershipService {
                 if (priceDifference > 0) {
                     // Inform the user about additional payment
                     System.out.println("Can thanh toan them " + priceDifference);
+
                 }
                 // Update the current membership to the new one
                 currentMembership.setMembershipId(membershipId);
                 currentMembership.setExpiryDate(LocalDateTime.now().plusMonths(newMembership.getDurationMonths()));
+                currentMembership.setPrice(newMembership.getPrice());
                 purchasedMembershipRepository.save(currentMembership);
             }
         } else {
@@ -46,6 +48,7 @@ public class PurchasedMembershipService {
             newPurchasedMembership.setMembershipId(membershipId);
             newPurchasedMembership.setPurchaseDate(LocalDateTime.now());
             newPurchasedMembership.setExpiryDate(LocalDateTime.now().plusMonths(newMembership.getDurationMonths()));
+            newPurchasedMembership.setPrice(newMembership.getPrice());
             purchasedMembershipRepository.save(newPurchasedMembership);
         }
     }

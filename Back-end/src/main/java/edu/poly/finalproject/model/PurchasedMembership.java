@@ -31,4 +31,8 @@ public class PurchasedMembership {
     @Column(name ="status")
     private String status;
 
+    @Column(name = "price")
+    private Double price;
+
+
 }
