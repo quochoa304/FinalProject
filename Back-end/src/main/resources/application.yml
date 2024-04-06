@@ -1,0 +1,15 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: 896387674450-36c0ktb6qabai36ol9271dlh2u1at97k.apps.googleusercontent.com
+            clientSecret: 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
+            redirectUri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: profile, email
+server:
+  port: 8000
+
+jwt:
+  secret: jailhouse
