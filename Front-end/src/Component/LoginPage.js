@@ -27,6 +27,7 @@ function LoginPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    localStorage.removeItem('upgradeMembership');
   if (location.state && location.state.errorMessage) {
     setErrorMessage(location.state.errorMessage);
   } else {
@@ -76,7 +77,7 @@ function LoginPage() {
           localStorage.setItem('user', 'true');
           console.log('Login successful:', data.token);
           // window.location.href = '/profile';
-          navigate("/profile");
+          navigate("/member");
   
           // Redirect to the main page or the requested page
           
@@ -122,7 +123,7 @@ function LoginPage() {
           localStorage.setItem('Authorization','Bearer '+ data.token);
   
           localStorage.setItem('user', 'true');
-          navigate("/profile");
+          navigate("/member");
   
           // Redirect to the main page or the requested page
           

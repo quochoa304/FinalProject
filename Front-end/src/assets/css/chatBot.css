@@ -1,0 +1,94 @@
+.chat-container {
+    position: fixed;
+    min-height: 400px;
+    bottom: 20px; /* Điều chỉnh để đặt chat box ở phía dưới màn hình */
+    right: 20px; /* Điều chỉnh để đặt chat box ở phía bên phải màn hình */
+    z-index: 1000; /* Đảm bảo chat box luôn hiển thị trên cùng */
+    display: flex; 
+}
+
+
+.chat-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #ed563b;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.chat-box {
+    width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #fff;
+    border: 1px solid #7a7676;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    background-color: #ed563b;
+    color: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.close-btn {
+    cursor: pointer;
+}
+
+.chat-body {
+    padding: 10px;
+    height: calc(100% - 100px);
+    overflow-y: scroll;
+    display: grid; 
+    grid-template-columns: 1fr; /* Chia cột thành một cột duy nhất */
+    grid-template-rows: auto; 
+}
+
+.message {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    max-width: 70%;
+}
+
+.user-message {
+    justify-self: end;
+    background-color: rgba(237, 86, 59, 0.9);
+    color: #fff; /* Màu chữ trắng */
+}
+
+.bot-message {
+    justify-self: start; 
+    background-color: #f1f0f0; /* Màu nền xám cho tin nhắn của người trả lời */
+    color: #333; /* Màu chữ đen */
+    border: 1px solid #333; /* Viền cho tin nhắn của người trả lời */
+}
+
+.chat-footer {
+    padding: 10px;
+    border-top: 1px solid #ccc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-footer input {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.chat-footer button {
+    background-color: #ed563b;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}

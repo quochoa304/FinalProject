@@ -14,6 +14,7 @@ import gymVideo from '../assets/images/gym-video.mp4';
 import useLoading from '../hook/useLoading';
 import '../assets/css/loading.css';
 import Header from './Header';
+import ChatBox from './ChatBox';
 
 const HomePage = () => {
     const [activeTab, setActiveTab] = useState('tabs-1');
@@ -31,6 +32,7 @@ const HomePage = () => {
       </div>  
       )}
       <Header />
+      <ChatBox />
 
       <div className="main-banner" id="top">
         <video autoPlay muted loop id="bg-video">

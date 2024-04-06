@@ -8,6 +8,7 @@ import trainingImage01 from '../assets/images/training-image-01.jpg';
 import trainingImage02 from '../assets/images/training-image-02.jpg';
 import trainingImage03 from '../assets/images/training-image-03.jpg';
 import trainingImage04 from '../assets/images/training-image-04.jpg';
+import ChatBox from './ChatBox';
 const Classes = () => {
   const [selectedClasses, setSelectedClasses] = useState(new Set());
   const [exercises, setExercises] = useState([]);
@@ -124,6 +125,7 @@ const handleSubmit = (e) => {
   return (
     <div>
       <Header />
+      <ChatBox />
       <div className="main-banner" id="top">
         <video autoPlay muted loop id="bg-video">
           <source src={gymVideo} type="video/mp4" />

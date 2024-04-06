@@ -13,7 +13,7 @@ import trainingImage04 from '../assets/images/training-image-04.jpg';
 import gymVideo from '../assets/images/gym-video.mp4';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
-
+import ChatBox from './ChatBox';
 
 const MemberPage = () => {
     const [activeTab, setActiveTab] = useState('tabs-1');
@@ -65,7 +65,7 @@ const MemberPage = () => {
   return (
     <div>
       <Header />
-
+      <ChatBox />
       <div className="main-banner" id="top">
         <video autoPlay muted loop id="bg-video">
           <source src={gymVideo} type="video/mp4" />
@@ -94,7 +94,7 @@ const MemberPage = () => {
                 <ul className="features-items">
                     <li className="feature-item">
                         <div className="left-icon">
-                            <img src="/assets/images/features-first-icon.png" alt="First One"/>
+                            <img src="../assets/images/features-first-icon.png" alt="First One"/>
                         </div>
                         <div className="right-content">
                             <h4>Basic Fitness</h4>
@@ -104,7 +104,7 @@ const MemberPage = () => {
                     </li>
                     <li className="feature-item">
                         <div className="left-icon">
-                            <img src="/assets/images/features-first-icon.png" alt="second one"/>
+                            <img src="../assets/images/features-first-icon.png" alt="second one"/>
                         </div>
                         <div className="right-content">
                             <h4>New Gym Training</h4>

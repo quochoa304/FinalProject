@@ -4,7 +4,7 @@ import Header from './Header';
 import gymVideo from '../assets/images/gym-video.mp4';
 import '../assets/css/ProfilePage.css';
 import { useNavigate } from 'react-router-dom';
-
+import ChatBox from './ChatBox';
 
 
 function ProfilePage() {
@@ -23,7 +23,6 @@ function ProfilePage() {
   const [membershipPackages, setMembershipPackages] = useState([]);
   const [showPurchaseMembership, setShowPurchaseMembership] = useState(false);
   const token = localStorage.getItem('Authorization');
-const [priceDifference, setPriceDifference] = useState(0);
   
   useEffect(() => {
     const url = window.location.href;
@@ -32,12 +31,16 @@ const [priceDifference, setPriceDifference] = useState(0);
     const storedMembership = localStorage.getItem('selectedMembership');
     if (storedMembership) {
       const selectedMembership = JSON.parse(storedMembership);
-      window.location.href = '/profile';
-      setMessage("Membership purchased successfully.");
+      console.log("Membership purchased successfully.");
       handleMembershipSelection(selectedMembership.id);
     } else {
-      console.error('No selected membership found in localStorage');
-    }}
+      const storedMembership = localStorage.getItem('upgradeMembership');
+      const upgradeMembership = JSON.parse(storedMembership);
+      console.log("Membership purchased successfully.");
+      handleMembershipSelection(upgradeMembership.id);
+    }} else{
+      console.log("Payment failed.");
+    }
     
     if (!token) {
       // Nếu chưa đăng nhập, chuyển hướng về trang login
@@ -82,6 +85,7 @@ const [priceDifference, setPriceDifference] = useState(0);
     setShowChangePassword(false);
     setShowChangeDetail(false);
     setSelectedMembership(null);
+    localStorage.removeItem('upgradeMembership');
   };
   
 
@@ -181,7 +185,7 @@ const [priceDifference, setPriceDifference] = useState(0);
         localStorage.removeItem('selectedMembership');
         localStorage.removeItem('upgradeMembership');
         // Tải lại trang
-        window.location.reload();
+        window.location.href = '/profile';
       })
       .catch(error => {
         console.error('Failed to purchase membership:', error);
@@ -214,7 +218,6 @@ const [priceDifference, setPriceDifference] = useState(0);
         upgradedMembership.price = newPriceDifference; // Thay đổi giá trị của bản sao
         localStorage.removeItem('selectedMembership'); // Xóa bản sao cũ khỏi localStorage
         localStorage.setItem('upgradeMembership', JSON.stringify(upgradedMembership)); // Lưu bản sao vào localStorage
-        setPriceDifference(newPriceDifference); // Cập nhật lại giá trị của priceDifference
       } else {
         setSelectedMembership(null);
       }
@@ -235,9 +238,7 @@ const [priceDifference, setPriceDifference] = useState(0);
         priceInVND = upgradeMembership.price * 24000;
       } else if (selectedMembership && selectedMembership.price !== undefined) {
         priceInVND = selectedMembership.price * 24000;
-      } else {
-        priceInVND = priceDifference * 24000; // Sử dụng giá chênh lệch nếu đã đồng ý nâng cấp gói thành viên
-      }
+      } 
   
       const response = await axios.post('http://localhost:8000/pay', { membershipPrice: priceInVND }, {
         headers: {
@@ -277,7 +278,7 @@ const [priceDifference, setPriceDifference] = useState(0);
     const vnp_ResponseCode = params['vnp_ResponseCode'];
   
     // Kiểm tra ResponseCode để xác định trạng thái thanh toán
-    return vnp_ResponseCode === '00'; // Trả về true nếu thành công, ngược lại trả về false
+    return vnp_ResponseCode === '00'; 
   };
   
 
@@ -305,6 +306,7 @@ const [priceDifference, setPriceDifference] = useState(0);
   return (
     <div>
       <Header />
+      <ChatBox />
       {showSuccessMessage && (
         <div className="success-notification">✔  Success!</div>
       )}
