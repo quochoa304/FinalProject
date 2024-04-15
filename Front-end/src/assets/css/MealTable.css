@@ -1,22 +1,98 @@
-#mealSuggestions {
-    width: 90%; /* 2/3 của màn hình */
-    margin: 0 auto; /* Căn giữa */
-    display: flex; /* Sử dụng Flexbox */
-    flex-wrap: wrap; /* Cho phép các mục chuyển sang hàng mới */
-    justify-content: center; /* Căn giữa các mục theo chiều ngang */
-}
-.mealItem:hover {
-    background-color: #ed563b; /* Màu nền mới khi hover */
-    cursor: pointer; /* Thay đổi con trỏ chuột để báo hiệu có thể tương tác */
+/* CSS for meal suggestion title */
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 
+/* CSS for meal item container */
 .mealItem {
-    flex: 1 1 30%;
-    margin: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%; 
+    margin: 10 auto; /* Center mealItem horizontally */
+}
+
+/* CSS for meal image */
+.mealImage {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+/* CSS for recipe title */
+.recipe-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* CSS for recipe label */
+.recipe-label p {
+    margin: 0;
+}
+
+/* CSS for serving and calories */
+.col-md-4 {
+    flex: 1;
     text-align: center;
 }
-.mealItem img {
-    max-width: 100%; /* Đảm bảo ảnh không vượt quá kích thước của mục */
-    height: auto; /* Giữ tỷ lệ ảnh */
+
+/* CSS for nutrients */
+.col-md-4 ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.col-md-4 li {
+    margin-bottom: 5%;
+}
+
+/* CSS for row bgr */
+.row.bgr {
+    width: 100%;
+    margin-top: 15px;
+    border: 1px solid #7a7a7a;
+    background-color: #f1f0ee; /* Darker background color */
+}
+.mealItem:hover {
+    background-color: #fff7f7;
+    border: 2px solid #e25c0e;
+    cursor: pointer;
+    transform: scale(1.05);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  .recipe-label ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.row .bgr li {
+    color: #756464;
+    font-size: 90%;
+    text-align: left;
+    text-indent: -1em; /* Đẩy nội dung về phía trái bằng kích thước của dấu chấm */
+}
+
+.row .bgr .col-md-4 ul li:nth-child(1)::before {
+    content: "🍖 ";
+    color: #008000; /* Màu xanh lá cho Protein */
+}
+
+.row .bgr .col-md-4 ul li:nth-child(2)::before {
+    content: "🧀 ";
+    color: #FFD700; /* Màu vàng cho Fat */
+}
+
+.row .bgr .col-md-4 ul li:nth-child(3)::before {
+    content: "🌾 ";
+    color: #8B4513; /* Màu nâu cho Carbohydrates */
 }

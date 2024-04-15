@@ -49,32 +49,107 @@ function CaloCalculator() {
 
         // Extract meals from the API response
         const meals = data.hits.map(hit => ({
-            name: hit.recipe.label,
-            fat: hit.recipe.totalNutrients.FAT.quantity,
-            protein: hit.recipe.totalNutrients.PROCNT.quantity,
-            carb: hit.recipe.totalNutrients.CHOCDF.quantity,
-            totalCalories: hit.recipe.calories,
-            serving: hit.recipe.yield,
-            ingredientLines: hit.recipe.ingredientLines,
-            image: hit.recipe.image
-        }));
-
-        meals.slice(0, 9).forEach(meal => {
-            const mealDiv = document.createElement("div");
-            mealDiv.classList.add("mealItem");
-
-            // Create an image element
-            const image = document.createElement("img");
-            image.src = meal.image;
-            image.alt = meal.name + " Image";
-            image.classList.add("mealImage");
-            mealDiv.appendChild(image);
-
-            // Add meal details
-            mealDiv.innerHTML += `<br>${meal.serving} servings of ${meal.name}: ${meal.totalCalories.toFixed(2) / 4 /*1 of 4 servings*/} kcal, ${meal.fat.toFixed(2)}g fat, ${meal.protein.toFixed(2)}g protein, ${meal.carb.toFixed(2)}g carbohydrate`;
-
-            mealSuggestions.appendChild(mealDiv);
+          name: hit.recipe.label,
+          fat: hit.recipe.totalNutrients.FAT.quantity,
+          protein: hit.recipe.totalNutrients.PROCNT.quantity,
+          carb: hit.recipe.totalNutrients.CHOCDF.quantity,
+          totalCalories: hit.recipe.calories,
+          serving: hit.recipe.yield,
+          ingredientLines: hit.recipe.ingredientLines,
+          image: hit.recipe.image
+      }));
+      const titleDiv = document.createElement("div");
+      titleDiv.textContent = "Meal Suggestions:";
+      titleDiv.classList.add("title");
+      
+      mealSuggestions.insertBefore(titleDiv, mealSuggestions.firstChild);
+      meals.slice(0, 9).forEach(meal => {
+        const mealDiv = document.createElement("div");
+        mealDiv.classList.add("mealItem");
+    
+        const rowDiv = document.createElement("div");
+        rowDiv.classList.add("row");
+    
+        const imageDiv = document.createElement("div");
+        imageDiv.classList.add("col-md-4");
+    
+        const image = document.createElement("img");
+        image.src = meal.image;
+        image.alt = meal.name + " Image";
+        image.classList.add("mealImage");
+        imageDiv.appendChild(image);
+    
+        const detailsDiv = document.createElement("div");
+        detailsDiv.classList.add("col-md-8");
+    
+        const recipeTitleDiv = document.createElement("div");
+        recipeTitleDiv.classList.add("recipe-title");
+        recipeTitleDiv.textContent = meal.name;
+    
+        const recipeLabelDiv = document.createElement("div");
+        recipeLabelDiv.classList.add("recipe-label");
+        meal.ingredientLines.forEach(ingredient => {
+            const ingredientLi = document.createElement("p");
+            ingredientLi.textContent = ingredient;
+            recipeLabelDiv.appendChild(ingredientLi);
         });
+    
+        detailsDiv.appendChild(recipeTitleDiv);
+        detailsDiv.appendChild(recipeLabelDiv);
+    
+        rowDiv.appendChild(imageDiv);
+        rowDiv.appendChild(detailsDiv);
+    
+        // Create row bgr div
+        const rowBgrDiv = document.createElement("div");
+        rowBgrDiv.classList.add("row");
+        rowBgrDiv.classList.add("bgr");
+    
+        // Create col-md-4 for serving and calories
+        const servingDiv = document.createElement("div");
+        servingDiv.classList.add("col-md-4");
+        const servingParagraph = document.createElement("p");
+        servingParagraph.textContent = `Servings: ${meal.serving}`;
+        servingDiv.appendChild(servingParagraph);
+    
+        const caloServingDiv = document.createElement("div");
+        caloServingDiv.classList.add("col-md-4");
+        const caloServingParagraph = document.createElement("p");
+        caloServingParagraph.innerHTML = `Total Calories:<br> ${(meal.totalCalories / 4).toFixed(2)} kcal per serving`;
+
+        caloServingDiv.appendChild(caloServingParagraph);
+    
+        // Create col-md-4 for nutrients
+        const nutriDiv = document.createElement("div");
+        nutriDiv.classList.add("col-md-4");
+        const nutriUl = document.createElement("ul");
+    
+        const proteinLi = document.createElement("li");
+        proteinLi.textContent = `Protein: ${meal.protein.toFixed(2)}g`;
+        const fatLi = document.createElement("li");
+        fatLi.textContent = `Fat: ${meal.fat.toFixed(2)}g`;
+        const carbsLi = document.createElement("li");
+        carbsLi.textContent = `Carbohydrates: ${meal.carb.toFixed(1)}g`;
+    
+        nutriUl.appendChild(proteinLi);
+        nutriUl.appendChild(fatLi);
+        nutriUl.appendChild(carbsLi);
+    
+        nutriDiv.appendChild(nutriUl);
+    
+        rowBgrDiv.appendChild(servingDiv);
+        rowBgrDiv.appendChild(caloServingDiv);
+        rowBgrDiv.appendChild(nutriDiv);
+    
+        // Append rows to mealDiv
+        mealDiv.appendChild(rowDiv);
+        mealDiv.appendChild(rowBgrDiv);
+    
+        // Append mealDiv to mealSuggestions
+        mealSuggestions.appendChild(mealDiv);
+    });
+    
+      
     } catch (error) {
         console.error('Error fetching meal suggestions:', error);
     }
@@ -369,9 +444,11 @@ function CaloCalculator() {
                 </div>
                 <br></br>
                 <div style={styles.button}>
-                <h5>Meal Suggestions:</h5>
                 </div>
               </div>
+              <br></br>
+              <br></br>
+              <hr style={{ border: '1px solid #000' }} />
               <table id="mealSuggestions" style={styles.mealSuggestions}></table>
             </div>
           </div>
