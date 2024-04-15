@@ -1,7 +1,8 @@
 package edu.poly.finalproject.Controller;
 
 import edu.poly.finalproject.service.VnpayConfig;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.UnsupportedEncodingException;
@@ -10,18 +11,17 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-
 @RestController
 public class VnpayPaymentController{
 
-    @GetMapping("/pay")
-    public String getPay() throws UnsupportedEncodingException{
-
+    @PostMapping("/pay")
+    public String postPay(@RequestBody Map<String, String> requestBody) throws UnsupportedEncodingException{
+        String membershipPrice = requestBody.get("membershipPrice");
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String orderType = "other";
-        long amount = 10000*100;
-        String bankCode = "NCB";
+        long amount = Long.parseLong(membershipPrice) * 100;
+        String bankCode = "VNBANK";
 
         String vnp_TxnRef = VnpayConfig.getRandomNumber(8);
         String vnp_IpAddr = "127.0.0.1";
