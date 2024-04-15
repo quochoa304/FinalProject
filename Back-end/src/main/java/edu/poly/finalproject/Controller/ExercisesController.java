@@ -5,7 +5,9 @@ import edu.poly.finalproject.service.ExerciseService;
 import edu.poly.finalproject.service.GymMembershipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -23,8 +25,26 @@ public class ExercisesController {
         return exerciseService.findAllExercises();
     }
 
-    @PostMapping(path = "/exercises/save", consumes = "application/json")
-    public Exercise saveExercises(@RequestBody Exercise exercise) {
+    @PostMapping(path = "/exercises/save")
+    public Exercise saveExercises(@RequestParam("image") MultipartFile image,
+                                  @RequestParam("name") String name,
+                                  @RequestParam("description") String description,
+                                  @RequestParam("type") String type) {
+        Exercise exercise = new Exercise();
+        exercise.setName(name);
+        exercise.setDescription(description);
+        exercise.setType(type);
+
+        // Check if an image file is uploaded
+        if (image != null && !image.isEmpty()) {
+            try {
+                exercise.setImage(image.getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+                // Handle error
+            }
+        }
+
         return exerciseService.saveExercise(exercise);
     }
 
@@ -33,14 +53,28 @@ public class ExercisesController {
         return exerciseService.get(id);
     }
 
-    @PutMapping(path = "/exercises/update/{id}", consumes = "application/json")
-    public Exercise updateExercise(@PathVariable Long id, @RequestBody Exercise updatedExercise) {
+    @PutMapping(path = "/exercises/update/{id}", consumes = "multipart/form-data")
+    public Exercise updateExercise(@PathVariable Long id,
+                                   @RequestParam("image") MultipartFile image,
+                                   @RequestParam("name") String name,
+                                   @RequestParam("description") String description,
+                                   @RequestParam("type") String type) {
         Exercise exercise = exerciseService.get(id);
 
         if (exercise != null) {
-            exercise.setName(updatedExercise.getName());
-            exercise.setType(updatedExercise.getType());
-            exercise.setDescription(updatedExercise.getDescription());
+            exercise.setName(name);
+            exercise.setType(type);
+            exercise.setDescription(description);
+
+            // Check if a new image file is uploaded
+            if (image != null && !image.isEmpty()) {
+                try {
+                    exercise.setImage(image.getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    // Handle error
+                }
+            }
 
             return exerciseService.saveExercise(exercise);
         } else {
@@ -48,6 +82,7 @@ public class ExercisesController {
             return null;
         }
     }
+
 
     @DeleteMapping(path = "/exercises/delete/{id}")
     // In RESTful services, 204 No Content is the more appropriate response

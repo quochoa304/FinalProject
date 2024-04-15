@@ -17,6 +17,8 @@ const Classes = () => {
   const [pathInput, setPathInput] = useState('');
   const token = localStorage.getItem('Authorization');
   const [activeTab, setActiveTab] = useState('tabs-1');
+  const [selectedType, setSelectedType] = useState(''); 
+  const [selectedGender, setSelectedGender] = useState(''); 
   const changeTab = (tabId) => {
     setActiveTab(tabId);
   };
@@ -53,7 +55,8 @@ const handleSubmit = (e) => {
     setError('Please select at least one muscle group.');
     return; 
 }
-
+const selectedType = document.getElementById('eType').value;
+const selectedGender = document.querySelector('input[name="gender"]:checked')?.value;
   axios.get('http://localhost:8000/user/exercises', {
     headers: {
         'Authorization': token
@@ -62,7 +65,16 @@ const handleSubmit = (e) => {
   .then(response => {
       const filterValues = pathInput.split(', ').filter(Boolean); // Tách pathInput thành một mảng và loại bỏ giá trị rỗng
       const filteredExercises = filterExercises(response.data.exercises, filterValues);
-      setExercises(filteredExercises);
+
+      const exercisesFilteredByTypeAndGender = filteredExercises.filter(exercise => {
+        return (
+          console.log(exercise.description),
+            exercise.description.toLowerCase().includes(selectedType.toLowerCase()) &&
+            exercise.description.toLowerCase().includes(selectedGender.toLowerCase())
+        );
+    });
+
+    setExercises(exercisesFilteredByTypeAndGender);
       setIsLoading(false);
   })
   .catch(error => {
@@ -145,33 +157,39 @@ const handleSubmit = (e) => {
           </svg>
       </div>
       <div className="fit-form">
-                <form onSubmit={handleSubmit}>
-                    <div className="section-heading" style={{display: 'flex', margin:'5px'}}>
-                        <h2 style={{fontSize:"Medium"}}>Choose <em>plan</em></h2>
-                    </div>
-                    <div className="form-group">
-                <label htmlFor="pathInput">Path:</label>
-                <input id="pathInput" value={pathInput} readOnly />
-            </div>
-                    <div className="form-group">
-                        <label htmlFor="eType">Type:</label>
-                        <select id="eType">
-                            <option value="Breakfast">Beginner</option>
-                            <option value="Dinner">Master</option>
-                            <option value="Lunch">Challenger</option>
-                        </select>
-                    </div>
-                    <div className="form-group gender">
-                        <label>Gender</label>
-                        <input id="maleGender" name="gender" type="radio" value="Male"/>
-                        <label htmlFor="maleGender">Male</label>
-                        <input id="femaleGender" name="gender" type="radio" value="Female"/>
-                        <label htmlFor="femaleGender">Female</label>
-                    </div>
-                    <div style={{textAlign:'center', display:'flex'}}>
-                      <button type="submit" style={{backgroundColor:'orange'}} className="btn btn-primary">Submit</button>
-                    </div>
-                </form>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div className="section-heading" style={{ margin: '5px' }}>
+        <h2 style={{ fontSize: "Medium" }}>Choose <em>plan</em></h2>
+    </div>
+    <div className="form-group" style={{ marginBottom: '10px', width: '100%' }}>
+        <label htmlFor="pathInput" style={{ width: '22%' }}>Path:</label>
+        <input id="pathInput" value={pathInput} readOnly style={{ width: '80%' }} />
+    </div>
+    <div className="form-group" style={{ marginBottom: '10px', width: '100%' }}>
+        <label htmlFor="eType" style={{ width: '20%' }}>Type:</label>
+        <select id="eType" value={selectedType} onChange={(e) => setSelectedType(e.target.value)} style={{ width: '80%', padding: '5px' }}>
+            <option value="">All</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Master">Master</option>
+            <option value="Challenger">Challenger</option>
+        </select>
+    </div>
+    <div className="form-group gender" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', width: '100%' }}>
+        <label style={{ marginRight: '10px', width: '20%' }}>Gender:</label>
+        <input id="allGender" name="gender" type="radio" value="" defaultChecked checked={selectedGender === ''} onChange={(e) => setSelectedGender(e.target.value)} />
+        <label htmlFor="allGender" style={{ marginRight: '10px' }}>All</label>
+        <input id="maleGender" name="gender" type="radio" value="Male" checked={selectedGender === 'Male'} onChange={(e) => setSelectedGender(e.target.value)} />
+        <label htmlFor="maleGender" style={{ marginRight: '10px' }}>Male</label>
+        <input id="femaleGender" name="gender" type="radio" value="Female" checked={selectedGender === 'Female'} onChange={(e) => setSelectedGender(e.target.value)} />
+        <label htmlFor="femaleGender">Female</label>
+    </div>
+    <div style={{ textAlign: 'center', margin: '10px' }}>
+        <button type="submit" style={{ backgroundColor: 'orange', padding: '10px 20px', borderRadius: '5px', color: 'white', border: 'none', cursor: 'pointer' }}>Submit</button>
+    </div>
+</form>
+
+
+
 
         </div>       
     </div>
@@ -193,8 +211,8 @@ const handleSubmit = (e) => {
             <li key={exercise.id} className="list-group-item exercise-item" style={{ display: 'flex',alignItems: 'center', padding: '10px', marginBottom:'5px' }}>
                 <div className="holder" style={{ marginRight: '20px' }}></div>
                 <img
-                    src="https://i.pinimg.com/originals/b1/31/66/b13166afbca01eb6abf94e6b84f65a2e.gif"
-                    alt={exercise.name}
+                    src={`data:image/png;base64, ${exercise.image}`}
+                    alt="Exercise Image"
                     className="exercise-image"
                     style={{ width: '100px', height: '100px', marginRight: '20px' }}
                 />
