@@ -21,6 +21,7 @@ const MemberPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [user, setUser] = useState(null);
+    const token = localStorage.getItem('Authorization');
     // Hàm để thay đổi tab hiện tại
     const changeTab = (tabId) => {
       setActiveTab(tabId);
@@ -31,8 +32,7 @@ const MemberPage = () => {
 
 
     useEffect(() => {
-      const token = localStorage.getItem('token');
-
+    
       if (!token) {
           // No token found, redirect to login page
           window.location.href = '/login';

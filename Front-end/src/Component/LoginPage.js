@@ -75,10 +75,15 @@ function LoginPage() {
           localStorage.setItem('Authorization','Bearer '+ data.token);
   
           localStorage.setItem('user', 'true');
+          if(username === 'admin@gmail.com'){
+            localStorage.setItem('role', 'admin');
+            navigate("/admin");
+          } else {
           console.log('Login successful:', data.token);
+          localStorage.setItem('role', 'user');
           // window.location.href = '/profile';
           navigate("/member");
-  
+          }
           // Redirect to the main page or the requested page
           
 
