@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState , useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Header from './Header';
 import gymVideo from '../assets/images/gym-video.mp4';
 import '../assets/css/classes.css';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import tabsFirstIcon from '../assets/images/tabs-first-icon.png';
 import trainingImage01 from '../assets/images/training-image-01.jpg';
 import trainingImage02 from '../assets/images/training-image-02.jpg';
@@ -10,8 +13,11 @@ import trainingImage03 from '../assets/images/training-image-03.jpg';
 import trainingImage04 from '../assets/images/training-image-04.jpg';
 import ChatBox from './ChatBox';
 const Classes = () => {
+  
   const [selectedClasses, setSelectedClasses] = useState(new Set());
   const [exercises, setExercises] = useState([]);
+  const [selectedExerciseId, setSelectedExerciseId] = useState(null);
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [pathInput, setPathInput] = useState('');
@@ -82,6 +88,15 @@ const selectedGender = document.querySelector('input[name="gender"]:checked')?.v
       setError('Failed to load exercises');
       setIsLoading(false);
   });
+};
+
+const handleItemClick = (exerciseId) => {
+  // Lưu selectedExerciseId vào local storage
+  localStorage.setItem('selectedExerciseId', exerciseId);
+  // Cập nhật selectedExerciseId trong state
+  setSelectedExerciseId(exerciseId);
+  // Chuyển hướng đến trang chi tiết của bài tập với exerciseId
+  navigate(`/exercise/${exerciseId}`);
 };
 
   useEffect(() => {
@@ -208,8 +223,9 @@ const selectedGender = document.querySelector('input[name="gender"]:checked')?.v
       <div>  
     <ul className="list-group" style={{ listStyle: 'none', padding: 0 }}>
         {exercises.slice(0, visibleItems).map((exercise) => (
-            <li key={exercise.id} className="list-group-item exercise-item" style={{ display: 'flex',alignItems: 'center', padding: '10px', marginBottom:'5px' }}>
+            <li key={exercise.id} className="list-group-item exercise-item" style={{ display: 'flex',alignItems: 'center', padding: '10px', marginBottom:'5px' }} onClick={() => handleItemClick(exercise.id)}>
                 <div className="holder" style={{ marginRight: '20px' }}></div>
+  
                 <img
                     src={`data:image/png;base64, ${exercise.image}`}
                     alt="Exercise Image"
@@ -219,6 +235,7 @@ const selectedGender = document.querySelector('input[name="gender"]:checked')?.v
                 <div className="exercise-info" style={{ flexGrow: 1, fontSize: '18px', fontWeight: 'bold', display: 'flex', flexDirection: 'column' }}>
                     <div className="exercise-name" style={{ textAlign: 'center' }}>{exercise.name} - {exercise.type}</div>
                 </div>
+
             </li>
         ))}
     </ul>

@@ -1,0 +1,23 @@
+#svgContainer img {
+    width: 100%; /* Đảm bảo ảnh chiếm toàn bộ chiều rộng của khung */
+    height: auto; /* Chiều cao tự động điều chỉnh theo tỷ lệ chiều rộng */
+  }
+  .training-plan {
+  background-color: #e44b25;
+  border-radius: 5px;;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.training-plan h4 {
+  margin-bottom: 10px;
+}
+
+.training-plan ul {
+  list-style-type: none;
+  padding: 0px;
+}
+
+.training-plan ul li {
+  margin-bottom: 5px;
+}
