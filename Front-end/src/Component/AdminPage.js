@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import gymVideo from '../assets/images/gym-video.mp4';
 import '../assets/css/ProfilePage.css';
-import AuthService from '../services/AuthService';
 import { useNavigate } from 'react-router-dom';
-
-
+import AuthService from '../services/AuthService';
+import Dashboard from './Chart/Dashboard';
+import RevenueChart from './Chart/RevenueChart';
+import RevenuePie from './Chart/RevenuePie';
 function AdminPage() {
+  const [isAdmin, setIsAdmin] = useState(false);
+  const navigate = useNavigate();
+  const [alertShown, setAlertShown] = useState(false);
+  const [displayDashboard, setDisplayDashboard] = useState(false);
   const [exercise, setExercise] = useState([]);
   const [message, setMessage] = useState('');
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -25,11 +29,29 @@ const [EditExercise, setEditExercise] = useState([]);
   const token = localStorage.getItem('Authorization');
 
   useEffect(() => {
+    const role = localStorage.getItem('role');
+    if (role === 'admin') {
+      setIsAdmin(true);
+    } else {
+      if (!alertShown) { 
+        setAlertShown(true);
+      }
+      navigate('/member');
+    }
     fetchMembershipPackages();
     fetchExercises();
+  }, [alertShown]);
 
-}, []);
-
+  const handleLogout = async () => {
+    try {
+      await AuthService.logout();
+      navigate('/login', { state: { successMessage: 'Logout success !' } });
+      localStorage.removeItem('user');
+      localStorage.removeItem('Authorization');
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
+  };
 const fetchMembershipPackages = () => {
   axios.get('http://localhost:8000/admin/gym-memberships', {
     headers: {
@@ -118,29 +140,45 @@ const deleteMembership = async (id) => {
 };
 
 const handleAddExercise = async e => {
-  // Add exercise
   e.preventDefault();
+  
+  const formData = new FormData(); // Tạo một FormData để chứa dữ liệu của bài tập
+
+  // Lấy thông tin của bài tập từ các trường nhập liệu
   const exerciseName = document.getElementById('exerciseName').value;
   const exerciseType = document.getElementById('exerciseType').value;
   const exerciseDescription = document.getElementById('description').value;
-  
-  axios.post('http://localhost:8000/admin/exercises/save', {
-    name: exerciseName,
-    type: exerciseType,
-    description : exerciseDescription
-  }, {
-    headers: {
-      'Authorization': token
-    }
-  })
-  alert('Exercise was save successfully.');
-  setEditExercise({
-    name: '',
-    type: '',
-    description: ''
-  });
-  fetchExercises();
+  const exerciseImage = document.getElementById('exerciseImage').files[0]; // Lấy tệp hình ảnh
+
+  // Thêm dữ liệu của bài tập vào FormData
+  formData.append('name', exerciseName);
+  formData.append('type', exerciseType);
+  formData.append('description', exerciseDescription);
+  formData.append('image', exerciseImage); // Thêm ảnh vào FormData
+
+  try {
+    // Gửi yêu cầu POST với FormData chứa dữ liệu của bài tập và ảnh
+    await axios.post('http://localhost:8000/admin/exercises/save', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data', // Đảm bảo rằng yêu cầu được gửi dưới dạng multipart/form-data
+        'Authorization': token
+      }
+    });
+
+    alert('Exercise was saved successfully.');
+    setEditExercise({
+      name: '',
+      type: '',
+      description: ''
+    });
+
+    fetchExercises(); // Lấy danh sách các bài tập mới sau khi đã thêm thành công
+  } catch (error) {
+    console.error('Error adding exercise:', error);
+    alert('Failed to add exercise.');
+  }
 }
+
 
 
 
@@ -163,15 +201,20 @@ const handleEditExercise = async e => {
   const exerciseName = document.getElementById('exerciseName').value;
   const exerciseType = document.getElementById('exerciseType').value;
   const exerciseDescription = document.getElementById('description').value;
+  const exerciseImage = document.getElementById('exerciseImage').files[0]; // Lấy hình ảnh mới từ input file
+
+  // Tạo đối tượng FormData và thêm dữ liệu cập nhật vào đó
+  const formData = new FormData();
+  formData.append('name', exerciseName);
+  formData.append('type', exerciseType);
+  formData.append('description', exerciseDescription);
+  formData.append('image', exerciseImage); // Thêm hình ảnh mới vào FormData
 
   try {
-    await axios.put(`http://localhost:8000/admin/exercises/update/${selectedEditExercisesId}`, {
-      name: exerciseName,
-      type: exerciseType,
-      description: exerciseDescription
-    }, {
+    await axios.put(`http://localhost:8000/admin/exercises/update/${selectedEditExercisesId}`, formData, {
       headers: {
-        'Authorization': token
+        'Authorization': token,
+        'Content-Type': 'multipart/form-data' // Đặt Content-Type là multipart/form-data để gửi dữ liệu có hình ảnh
       }
     });
     alert('Exercise was updated successfully.');
@@ -192,6 +235,7 @@ const handleEditExercise = async e => {
 }
 
 
+
 const editMembership = async (id) => {
   try {
     const response = await axios.get(`http://localhost:8000/admin/gym-memberships/${id}`, {
@@ -208,6 +252,7 @@ const editMembership = async (id) => {
 
 const deleteExercise = async (id) => {
   try {
+    console.log(id);
     const confirmDelete = window.confirm("Are you sure to delete this exercise?");
     if (confirmDelete) {
       await axios.delete(`http://localhost:8000/admin/exercises/delete/${id}`, {
@@ -308,21 +353,21 @@ const deleteExerciseFromMembership = async (exerciseId) => {
     setDisplayMembershipExercises(false);
     setDisplayMembership(true);
     setDisplayExercises(false);
-    setDisplayAccount(false);
+    setDisplayDashboard(false);
   };
 
   const handleToggleExercises = () => {
     setDisplayMembershipExercises(false);
     setDisplayMembership(false);
     setDisplayExercises(true);
-    setDisplayAccount(false);
+    setDisplayDashboard(false);
   };
 
-  const handleToggleAccount = () => {
-    setDisplayMembershipExercises(false);
+  const handleToggleDashboard = () => {
+    // Set displayDashboard to true and hide other sections
+    setDisplayDashboard(true);
     setDisplayMembership(false);
     setDisplayExercises(false);
-    setDisplayAccount(true);
   };
 
   const handleToggleMembershipExercises = async (id) => {
@@ -339,6 +384,10 @@ const deleteExerciseFromMembership = async (exerciseId) => {
     setDisplayMembership(true);
     fetchExercises();
 
+  };
+  const handleImageChange = (event) => {
+    const imageFile = event.target.files[0]; // Lấy tệp ảnh từ sự kiện
+    setMembership({ ...membership, image: imageFile }); // Cập nhật trạng thái với tệp ảnh đã chọn
   };
   
 
@@ -362,7 +411,9 @@ const deleteExerciseFromMembership = async (exerciseId) => {
     },
     
   };
-
+  if (!isAdmin) {
+    return null;
+  }
 return (
   <div>
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -380,7 +431,10 @@ return (
                 <a className="nav-link" href="#" onClick={handleToggleExercises}>Manager Exercises</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#" onClick={handleToggleAccount}>Manager Account</a>
+                <a className="nav-link" href="#" onClick={handleToggleDashboard}>Dashboard</a>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link abc" style={{color:'red'}} href="#" onClick={handleLogout}>Logout</a>
               </li>
             </ul>
           </div>
@@ -464,6 +518,10 @@ return (
         <input type="text" className="form-control" id="exerciseType" value={EditExercise.type} onChange={handleExerciseTypeChange}required />
       </div>
       <div className="form-group">
+        <label htmlFor="exerciseType">Exercise Img:</label>
+        <input type="file" className="form-control" id="exerciseImage" onChange={handleImageChange} accept="image/*" required />
+      </div>
+      <div className="form-group">
         <label htmlFor="description">Description:</label>
         <input type="text" className="form-control" id="description" value={EditExercise.description} onChange={handleExerciseDescripChange}required />
       </div>
@@ -478,6 +536,7 @@ return (
       <th style={{ border: '1px solid black', width:'20%' }}>Exercise Name</th>
       <th style={{ border: '1px solid black' }}>Type</th>
       <th style={{ border: '1px solid black', width:'40%'}}>Description</th>
+      <th style={{ border: '1px solid black' }}>Image</th>
       <th style={{ border: '1px solid black', width:'14.6%' }}>Actions</th>
     </tr>
   </thead>
@@ -487,6 +546,9 @@ return (
         <td style={{ border: '1px solid black' }}>{exercises.name}</td>
         <td style={{ border: '1px solid black' }}>{exercises.type}</td>
         <td style={{ border: '1px solid black' }}>{exercises.description}</td>
+        <td style={{ border: '1px solid black' }}>
+    <img src={`data:image/png;base64, ${exercises.image}`} alt="Exercise Image" style={{ width: '100px', height: '100px' }} />
+</td>
         <td style={{ border: '1px solid black' }}>
         <button  className="btn btn-primary" style={{ marginRight:'5px'}} onClick={(e) => {
     e.preventDefault(); // Ngăn trình duyệt thực hiện hành động mặc định
@@ -554,6 +616,22 @@ return (
                 </tbody>
             </table>
         </div>
+)}      {displayDashboard && (
+<div className="container">
+<h3>Dashboard: </h3>
+<br />
+      <div className="row">
+      <div className="col-lg-6">
+          <RevenuePie />
+        </div>
+        <div className="col-lg-6">
+        <Dashboard />
+        </div>
+      </div>
+      <br></br>      <br></br>
+      <br></br>
+      <RevenueChart />
+    </div>
 )}
   </div>
 );
