@@ -67,7 +67,7 @@ function LoginPage() {
           console.log('Server response:', response.headers); // Log the full response
           
           if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) {
-              throw new Error('Login failed');
+              throw new Error('Wrong username or password');
           }
   
           const data = await response.json();
@@ -89,6 +89,7 @@ function LoginPage() {
 
       } catch (error) {
           console.error('Login error:', error);
+          setErrorMessage(error.message);
       }
 
   };
@@ -143,6 +144,7 @@ function LoginPage() {
 
   const onFailure = (res) => {
     console.log('Login failed: res:', res);
+    setMessage('Press "Login" to continue.');
   };
 
   return (

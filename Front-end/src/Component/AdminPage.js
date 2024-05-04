@@ -25,7 +25,12 @@ const [exercisesInMembership, setExercisesInMembership] = useState([]);
 const [displayMembershipExercises, setDisplayMembershipExercises] = useState(false);
 const [selectedExercises, setSelectedExercises] = useState([]);
 const [EditExercise, setEditExercise] = useState([]);
-
+const [displayRequest, setdisplayRequest] = useState(false);
+const [Request, setRequest] = useState([]);
+const [toEmail, setToEmail] = useState('');
+const [subject, setSubject] = useState('');
+const [body, setBody] = useState('');
+const [response, setResponse] = useState('');
   const token = localStorage.getItem('Authorization');
 
   useEffect(() => {
@@ -39,6 +44,7 @@ const [EditExercise, setEditExercise] = useState([]);
       navigate('/member');
     }
     fetchMembershipPackages();
+    fetchExercises();
     fetchExercises();
   }, [alertShown]);
 
@@ -75,6 +81,19 @@ const fetchExercises = () => {
   })
   .catch(error => console.error('There was an error fetching membership info!', error));
 };
+
+const fetchRequest = () => {
+  axios.get('http://localhost:8000/admin/showAllExpertRequest', {
+    headers: {
+      'Authorization': token
+    }
+  })
+  .then(response => {
+    setRequest(response.data);
+  })
+  .catch(error => console.error('There was an error fetching membership info!', error));
+};
+
 
 
 const [membership, setMembership] = useState({
@@ -264,6 +283,7 @@ const deleteExercise = async (id) => {
     }
   } catch (error) {
     console.error('Error deleting exercise:', error);
+    alert('The assignment cannot be deleted because it exists in a membership package');
   }
 }
 
@@ -341,6 +361,71 @@ const deleteExerciseFromMembership = async (exerciseId) => {
 }
 
 
+
+const downloadFile = (base64Data, filename, fileExtension) => {
+  const byteCharacters = atob(base64Data);
+  const byteArrays = [];
+
+  for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+    const slice = byteCharacters.slice(offset, offset + 512);
+
+    const byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
+  }
+
+  const blob = new Blob(byteArrays, {type: "application/pdf"});
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+};
+
+const updateExpertRequest = async (id, status, request) => {
+  try {
+    await axios.put(`http://localhost:8000/admin/updateExpertRequest/${id}`, status, {
+      headers: {
+        'Authorization': token
+      }
+    });
+    if (status === 'accepted') {
+      // Gọi hàm sendEmail với các thông tin cần thiết
+      sendEmail(request.user.email, 'Expert Request Accepted', 'Your expert request has been accepted.');
+    } else {
+      sendEmail(request.user.email, 'Expert Request Denied', 'Your expert request has been denied. Please use another certificate and try again.');
+    }
+    fetchRequest();
+  } catch (error) {
+    console.error('Error updating request:', error);
+  }
+};
+
+
+const sendEmail = async (toEmail, subject, body) => {
+  try {
+    const res = await fetch('/sendEmail?toEmail=' + encodeURIComponent(toEmail) + '&subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body), {
+      method: 'POST',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const data = await res.text();
+    setResponse(data);
+  } catch (err) {
+    console.error(err);
+    setResponse('Error sending email');
+  }
+};
+
+
+
   const showSuccessNotification = () => {
     setShowSuccessMessage(true);
     setTimeout(() => {
@@ -350,10 +435,10 @@ const deleteExerciseFromMembership = async (exerciseId) => {
 
 
   const handleToggleMembership = () => {
-    setDisplayMembershipExercises(false);
     setDisplayMembership(true);
     setDisplayExercises(false);
     setDisplayDashboard(false);
+    setDisplayMembershipExercises(false);
   };
 
   const handleToggleExercises = () => {
@@ -364,24 +449,26 @@ const deleteExerciseFromMembership = async (exerciseId) => {
   };
 
   const handleToggleDashboard = () => {
-    // Set displayDashboard to true and hide other sections
+    setdisplayRequest(false);
     setDisplayDashboard(true);
     setDisplayMembership(false);
     setDisplayExercises(false);
+    setdisplayRequest(false);
   };
 
   const handleToggleMembershipExercises = async (id) => {
     await fetchExercisesInMembership(id);  
-  
     setDisplayMembership(false);
     setDisplayExercises(false);
     setDisplayMembershipExercises(true); 
     setDisplayAccount(false);
+    setdisplayRequest(false);
   };
 
   const handleBackToMembershipList = () => {
     setDisplayMembershipExercises(false);
     setDisplayMembership(true);
+    setdisplayRequest(false);
     fetchExercises();
 
   };
@@ -389,6 +476,13 @@ const deleteExerciseFromMembership = async (exerciseId) => {
     const imageFile = event.target.files[0]; // Lấy tệp ảnh từ sự kiện
     setMembership({ ...membership, image: imageFile }); // Cập nhật trạng thái với tệp ảnh đã chọn
   };
+  const handleRequest = () => {
+    fetchRequest();
+    setDisplayMembership(false);
+    setDisplayExercises(false);
+    setDisplayAccount(true);
+
+  }
   
 
   const styles = {
@@ -425,13 +519,16 @@ return (
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ml-auto">
               <li className="nav-item">
-                <a className="nav-link" href="#" onClick={handleToggleMembership}>Manager Gym Membership</a>
+                <a className="nav-link" href="#" onClick={handleToggleMembership}>Manager Gym Membership&emsp; |</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#" onClick={handleToggleExercises}>Manager Exercises</a>
+                <a className="nav-link" href="#" onClick={handleToggleExercises}>Manager Exercises&emsp; |</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#" onClick={handleToggleDashboard}>Dashboard</a>
+                <a className="nav-link" href="#" onClick={handleRequest}>Manager Expert Request&emsp; |</a>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link" href="#" onClick={handleToggleDashboard}>Dashboard &emsp;|</a> 
               </li>
               <li className="nav-item">
                 <a className="nav-link abc" style={{color:'red'}} href="#" onClick={handleLogout}>Logout</a>
@@ -570,8 +667,44 @@ return (
       )}
      {displayAccount && (
         <div className="container">
-          <h2>Manager Account</h2>
-          {/* Account related content goes here */}
+          <h2>Manager Request</h2> <br/>
+          <div>
+          <table style={{ margin: 'auto', textAlign: 'center', border: '2px solid #ed563b', padding: '10px', width: '100%' }}>
+      <thead style={{ borderBottom: '2px solid #ed563b', padding: '10px' }}>
+        <tr>
+          <th>Request ID</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>File</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Request.map((request) => (
+          <tr key={request.id} style={{ border: '1px solid black' }}>
+            <td style={{ border: '1px solid black' }}>{request.id}</td>
+            <td style={{ border: '1px solid black' }}>{request.user.email}</td>
+            <td style={{ border: '1px solid black' }}>{request.status}</td>
+            <td style={{ border: '1px solid black' }}>
+              <button onClick={() => downloadFile(request.applicationData, request.id)}>
+                View File
+              </button>
+            </td>
+            <td style={{ border: '1px solid black' }}>
+              <button style={{ marginRight: '10px' }} className="btn btn-success" onClick={() => updateExpertRequest(request.id, 'accepted', request)}>
+                Accept
+              </button>
+              <button className="btn btn-danger" onClick={() => updateExpertRequest(request.id, 'denied', request)}>
+                Reject
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+<br />
+
+      </div>
         </div>
       )}
 

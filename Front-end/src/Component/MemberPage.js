@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-// Import CSS trong thư mục src/assets/css
+import { useLocation, useNavigate } from 'react-router-dom';
 import '../assets/css/bootstrap.min.css';
 import '../assets/css/font-awesome.css';
 import '../assets/css/templatemo-training-studio.css';
@@ -9,58 +9,90 @@ import trainingImage01 from '../assets/images/training-image-01.jpg';
 import trainingImage02 from '../assets/images/training-image-02.jpg';
 import trainingImage03 from '../assets/images/training-image-03.jpg';
 import trainingImage04 from '../assets/images/training-image-04.jpg';
-// Thay thế đường dẫn với đường dẫn đúng tới hình ảnh và video trong dự án của bạn
 import gymVideo from '../assets/images/gym-video.mp4';
-import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 import ChatBox from './ChatBox';
+import axios from 'axios';
+import BecomeTrainer from './BecomeTrainer';
 
 const MemberPage = () => {
+  const location = useLocation();
+  const [requests, setRequests] = useState([]);
     const [activeTab, setActiveTab] = useState('tabs-1');
-
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [user, setUser] = useState(null);
+    const [showButton, setShowButton] = useState(true);
+    const [showHireTrainer, setShowHireTrainer] = useState(false);
+    const [showExpertRequest, setShowExpertRequest] = useState(false);
     const token = localStorage.getItem('Authorization');
-    // Hàm để thay đổi tab hiện tại
-    const changeTab = (tabId) => {
-      setActiveTab(tabId);
-    };
 
     const navigate = useNavigate();
-
-
-
     useEffect(() => {
-    
       if (!token) {
-          // No token found, redirect to login page
-          window.location.href = '/login';
-          return;
+        // Nếu chưa đăng nhập, chuyển hướng về trang login
+        navigate('/login?errorMessage=You need to login first');
+        return; // Dừng việc tiếp tục thực thi các công việc khác trong useEffect
       }
+      fetchRequests();
+      const currentUrl = window.location.href;
+      if (currentUrl.includes("PaymentSuccess")) {
+        window.href = '/member';
+        handleToggleHire();
+    }
 
-      fetch('http://localhost:8000/authenticate', {
-          method: 'POST',
+    }, []);
+
+
+
+
+  const handlePayButtonClick = async () => {
+    const userConfirmed = window.confirm('Are you sure to pay 10 USD for hiring a trainer?');
+  
+    if (userConfirmed) {
+      try {
+        const response = await axios.post('http://localhost:8000/pay', { 
+        membershipPrice: 250000 ,
+        vnp_OrderInfo: "Hire a trainer" }, {
           headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
+            'Authorization': token
           }
-      })
-      .then(response => {
-          if (!response.ok) {
-              throw new Error('Authentication failed');
-          }
-          return response.json();
-      })
-      .then(data => {
-          setUser(data.user);
-          setLoading(false);
-      })
-      .catch(error => {
-          setError('Authentication failed');
-          setLoading(false);
-      });
-  }, []);
+        });
+        const { data } = response;
+    
+        window.location.href = data;
+      } catch (error) {
+        console.error('Error occurred while making payment:', error);
+      }
+    }
+  };
+
+  
+  const handleToggleHire = () => {
+    setShowHireTrainer(!showHireTrainer);
+    setShowButton(false);
+    setShowExpertRequest(false);
+  }
+  const handleBack = () => {
+    setShowHireTrainer(false);
+    setShowButton(true);
+    setShowExpertRequest(false);
+  }
+  const handleToggleRequest = () => {
+    setShowExpertRequest(!showExpertRequest);
+    setShowButton(false);
+    setShowHireTrainer(false);
+  }
+
+  const fetchRequests = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/api/rentRequests/userRequest', {
+        headers: {
+            'Authorization': token
+        }
+    })
+      setRequests(response.data);
+    } catch (error) {
+      console.error('Error fetching requests:', error);
+    }
+  };
 
   return (
     <div>
@@ -72,11 +104,64 @@ const MemberPage = () => {
         </video>
         <div className="video-overlay header-text">
           <div className="caption">
-            <h6>work harder, get stronger</h6>
+
             <h2>Member <em>page</em></h2>
+            {showButton && (             
             <div className="main-button scroll-to-section">
-              <a href="#features">Become a member</a>
+              <a onClick={handleToggleHire}>Hire a trainer</a> &nbsp;
+              <a onClick={handleToggleRequest}>Become a trainer</a>
             </div>
+
+             )}  
+            {showHireTrainer && (
+                <div>
+                <div style={{display:'block'}}>
+                    <h6>Hire a online trainer</h6><br></br>
+                    <h7>- Only 10$ fer time (5 hours/time)</h7><br></br>
+                    <h7>- Profestional trainer with European PT certificate</h7><br></br>
+                    <h7>- Private 1-on-1 training with online meetings</h7><br></br>
+                </div><br></br>
+          
+                <div className="main-button scroll-to-section">
+                <a onClick={handlePayButtonClick}>Pay now</a>&nbsp;
+                <a onClick={handleBack}>Back</a>
+                </div>
+                <div><br/>
+      <table style={{ margin: 'auto', textAlign: 'center', border: '2px solid #ed563b', padding: '10px', width: '80%' }}>
+        <thead>
+          <tr>
+            <th style={{ width: '25%', border: '2px solid #ed563b' }}>Master Name</th>
+            <th style={{ width: '25%', border: '2px solid #ed563b' }}>Master Email</th>
+            <th style={{ width: '25%', border: '2px solid #ed563b' }}>Link access</th>
+            <th style={{ width: '25%' , border: '2px solid #ed563b'}}>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {requests.map(request => (
+            <tr key={request.id}>
+              <td>{request.master.firstName + ' ' + request.master.lastName}</td>
+              <td>{request.master.email}</td>
+              <td>
+                {request.join_url && request.join_url !== "" ?
+                <a href={request.join_url} style={{ color: 'blue' }}>Join link</a> :
+                <a href="#" style={{ color: 'red' }}>Link empty</a>
+                 }
+              </td>
+              <td>{request.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table><br/>
+      <button onClick={fetchRequests}>Reload</button>
+    </div>
+                </div>
+                )}
+            {showExpertRequest && (
+                <div>
+                <BecomeTrainer/> <br></br>
+                <button onClick={handleBack}>Back to member page</button>
+                </div>
+            )}
           </div>
         </div>
       </div>
@@ -170,7 +255,7 @@ const MemberPage = () => {
                     <h2>Don’t <em>think</em>, begin <em>today</em>!</h2>
                     <p>Ut consectetur, metus sit amet aliquet placerat, enim est ultricies ligula, sit amet dapibus odio augue eget libero. Morbi tempus mauris a nisi luctus imperdiet.</p>
                     <div className="main-button scroll-to-section">
-                        <a href="#our-classNamees">Become a member</a>
+                        <a href="#our-classNamees">Discover now</a>
                     </div>
                 </div>
             </div>

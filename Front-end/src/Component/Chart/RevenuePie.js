@@ -69,7 +69,6 @@ function RevenueChart() {
         },
         legend: {
           display: true,
-
         }
       }
     };

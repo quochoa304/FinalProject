@@ -3,9 +3,9 @@ import axios from 'axios';
 import Header from './Header';
 import gymVideo from '../assets/images/gym-video.mp4';
 import '../assets/css/ProfilePage.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Redirect  } from 'react-router-dom';
 import ChatBox from './ChatBox';
-
+import { toast } from 'react-toastify';
 
 function ProfilePage() {
   const [user, setUser] = useState({});
@@ -22,24 +22,31 @@ function ProfilePage() {
   const[showErrorMessage, setShowErrorMessage] = useState(false);
   const [membershipPackages, setMembershipPackages] = useState([]);
   const [showPurchaseMembership, setShowPurchaseMembership] = useState(false);
+  const [masterId, setMasterId] = useState(null);
   const token = localStorage.getItem('Authorization');
   
   useEffect(() => {
     const url = window.location.href;
-  if (checkPaymentStatus(url)) {
-    // Nếu thanh toán thành công, thực hiện hàm buyMembership với selectedMembership.id từ localStorage
-    const storedMembership = localStorage.getItem('selectedMembership');
-    if (storedMembership) {
-      const selectedMembership = JSON.parse(storedMembership);
-      console.log("Membership purchased successfully.");
-      handleMembershipSelection(selectedMembership.id);
-    } else {
-      const storedMembership = localStorage.getItem('upgradeMembership');
-      const upgradeMembership = JSON.parse(storedMembership);
-      console.log("Membership purchased successfully.");
-      handleMembershipSelection(upgradeMembership.id);
-    }} else{
-      console.log("Payment failed.");
+    const isPaymentSuccess = checkPaymentStatus(url);
+    const isBuyMembershipOrder = checkOrderInfo(url);
+    const isRentOrder = checkRentInfo(url);
+
+    if (isPaymentSuccess && isBuyMembershipOrder && !isRentOrder) {
+        const storedMembership = localStorage.getItem('selectedMembership');
+        if (storedMembership) {
+            const selectedMembership = JSON.parse(storedMembership);
+            console.log("Membership purchased successfully.");
+            handleMembershipSelection(selectedMembership.id);
+        } else {
+            const storedMembership = localStorage.getItem('upgradeMembership');
+            const upgradeMembership = JSON.parse(storedMembership);
+            console.log("Membership purchased successfully.");
+            handleMembershipSelection(upgradeMembership.id);
+        }
+    } else if (isPaymentSuccess && isRentOrder && !isBuyMembershipOrder) {
+      createRentRequest();
+    } else  {
+        console.log("Payment failed.");
     }
     
     if (!token) {
@@ -75,7 +82,72 @@ function ProfilePage() {
         showSuccessNotification();
         localStorage.removeItem('membershipPurchaseSuccess');
     }
-}, []);
+}, [token]);
+
+const createRentRequest = async () => {
+  try {
+    axios.post('http://localhost:8000/api/rentRequests',null,
+      {
+        headers: {
+          'Authorization': token
+        }
+      }
+    );
+    window.location.href = `/member?PaymentSuccess`; 
+  } catch (error) {
+    const errorMessage = error.response.data.message;
+    localStorage.setItem('rentRequestErrorMessage', errorMessage);
+    window.location.href = `/member?Payment`; 
+  }
+};
+
+const checkOrderInfo = (url) => {
+  // Phân tích URL để lấy các tham số
+  const urlParts = url.split('?');
+  if (urlParts.length < 2) {
+      // URL không có tham số
+      return false;
+  }
+  const queryString = urlParts[1];
+
+  // Phân tích query string để trích xuất giá trị của vnp_OrderInfo
+  const params = {};
+  queryString.split('&').forEach((param) => {
+      const [key, value] = param.split('=');
+      params[key] = value;
+  });
+
+  // Lấy giá trị của vnp_OrderInfo
+  const vnp_OrderInfo = decodeURIComponent(params['vnp_OrderInfo']);
+
+  // Kiểm tra vnp_OrderInfo để xác định nội dung đơn hàng
+  return vnp_OrderInfo === 'Buy+a+membership';
+};
+
+
+const checkRentInfo = (url) => {
+  // Phân tích URL để lấy các tham số
+  const urlParts = url.split('?');
+  if (urlParts.length < 2) {
+      // URL không có tham số
+      return false;
+  }
+  const queryString = urlParts[1];
+
+  // Phân tích query string để trích xuất giá trị của vnp_OrderInfo
+  const params = {};
+  queryString.split('&').forEach((param) => {
+      const [key, value] = param.split('=');
+      params[key] = value;
+  });
+
+  // Lấy giá trị của vnp_OrderInfo
+  const vnp_OrderInfo = decodeURIComponent(params['vnp_OrderInfo']);
+
+  // Kiểm tra vnp_OrderInfo để xác định nội dung đơn hàng
+  return vnp_OrderInfo === 'Hire+a+trainer';
+};
+
 
   const navigate = useNavigate();
 
@@ -240,7 +312,7 @@ function ProfilePage() {
         priceInVND = selectedMembership.price * 24000;
       } 
   
-      const response = await axios.post('http://localhost:8000/pay', { membershipPrice: priceInVND }, {
+      const response = await axios.post('http://localhost:8000/pay', { membershipPrice: priceInVND, vnp_OrderInfo: "Buy a membership" }, {
         headers: {
           'Authorization': token
         }
@@ -305,6 +377,18 @@ function ProfilePage() {
 
   return (
     <div>
+      {showSuccessMessage && (
+      <div style={{
+        position: 'fixed',
+        top: '10px',
+        right: '10px',
+        backgroundColor: 'green',
+        color: 'white',
+        padding: '10px'
+      }}>
+        Trạng thái: Thành công
+      </div>
+    )}
       <Header />
       <ChatBox />
       {showSuccessMessage && (
