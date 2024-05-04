@@ -1,23 +1,33 @@
 package edu.poly.finalproject.Controller;
 
 import edu.poly.finalproject.model.Exercise;
+import edu.poly.finalproject.model.ExpertRequest;
+import edu.poly.finalproject.model.Role;
+import edu.poly.finalproject.model.User;
+import edu.poly.finalproject.repository.UserRepository;
 import edu.poly.finalproject.service.ExerciseService;
+import edu.poly.finalproject.service.ExpertRequestService;
 import edu.poly.finalproject.service.GymMembershipService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "/admin") // This means all methods will start with /admin
-public class ExercisesController {
+public class AdminExerciseController {
 
     @Autowired
     private ExerciseService exerciseService;
     @Autowired
     private GymMembershipService gymMembershipService;
+    @Autowired
+    private ExpertRequestService expertRequestService;
+    @Autowired
+    private UserRepository userRepository;
 
     // This method returns JSON
     @GetMapping(path = "/exercises", produces = "application/json")
@@ -89,6 +99,52 @@ public class ExercisesController {
     // status when the server successfully performs a DELETE request.
     public void deleteExercises(@PathVariable(name = "id") Long id) {
         exerciseService.deleteExercise(id);
+    }
+
+    @GetMapping("/showAllExpertRequest")
+    public List<ExpertRequest> getAllExpertRequest() {
+        return expertRequestService.getExpertRequest();
+    }
+
+    @PutMapping("/updateExpertRequest/{id}")
+    public ExpertRequest updateStatus(@PathVariable Long id, @RequestBody String status) {
+        ExpertRequest existingRequest = expertRequestService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No ExpertRequest found with this id: " + id));
+
+        validateStatus(status);
+
+        existingRequest.setStatus(status);
+        expertRequestService.saveExpertRequest(existingRequest); // Saving the updated request
+
+        User requestUser = existingRequest.getUser(); // Get user from the request
+        String userEmail = requestUser.getEmail(); // Get email of the user
+
+        User user = userRepository.findByEmail(userEmail);
+
+        if (status.equals("accepted")) {
+            if (user != null) {
+
+                user.setRoles(new ArrayList<>(List.of(new Role("ROLE_MASTER"))));
+                userRepository.save(user); // Saving the updated user
+            }
+        }
+        if (status.equals("denied")) {
+            if (user != null) {
+                user.setRoles(new ArrayList<>(List.of(new Role("ROLE_USER"))));
+                userRepository.save(user); // Saving the updated user
+            }
+        }
+
+        return existingRequest;
+    }
+
+
+    private void validateStatus(String status) {
+        // Check if the status is valid
+        if (!status.equals("pending") && !status.equals("accepted") && !status.equals("denied")) {
+            throw new IllegalArgumentException("Invalid status. " +
+                    "Status must be either 'pending', 'accepted' or 'denied'");
+        }
     }
 
 }

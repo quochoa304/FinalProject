@@ -14,7 +14,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/admin")
-public class GymMembershipController {
+public class AdminGymMembershipController {
 
     @Autowired
     private GymMembershipService gymMembershipService;
